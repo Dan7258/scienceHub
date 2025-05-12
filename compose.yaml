@@ -3,7 +3,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    container_name: scinceHub_app
+    container_name: scienceHub_app
     ports:
       - "9000:9000"
     depends_on:
@@ -14,13 +14,9 @@ services:
       - .env
   db:
     image: postgres:latest
-    container_name: postgres_container
+    container_name: db
     env_file:
       - .env
-    environment:
-      POSTGRES_USER: admin
-      POSTGRES_PASSWORD: admin
-      POSTGRES_DB: scinceHubDB
     volumes:
       - pgdata:/var/lib/postgresql/data
       - ./init.sql:/docker-entrypoint-initdb.d/init.sql
@@ -40,9 +36,8 @@ services:
     ports:
       - "9999:9999" #API
       - "9990:9990" #web UI
-    environment:
-      MINIO_ROOT_USER: scienceHubAdmin
-      MINIO_ROOT_PASSWORD: scienceHubAdmin
+    env_file:
+      - .env
     volumes:
       - minio-data:/uploads
     command: ["server", "/uploads", "--address", ":9999", "--console-address", ":9990"]

@@ -143,19 +143,18 @@ func (p Profiles) StopChangeEmail() revel.Result {
 }
 
 func (p Profiles) SendVerificationCodeForChangePassword() revel.Result {
-	userID, err := middleware.ValidateJWT(p.Request, "auth_token")
-	if err != nil {
-		return p.Redirect("/login")
-	}
-	sUserID := fmt.Sprintf("%d", userID)
 	profile := new(models.Profiles)
-	err = p.Params.BindJSON(profile)
+	err := p.Params.BindJSON(profile)
 	if err != nil {
 		p.Response.Status = http.StatusBadRequest
 		revel.AppLog.Error(err.Error())
 		return p.RenderJSON(map[string]string{"error": err.Error()})
 	}
 
+	ok := models.ThsProfilesIsExist(profile.Login)
+	if !ok {
+		return p.RenderJSON(map[string]string{"error": "Пользователя с такой почтой не существует"})
+	}
 	randomNumber, err := GenerateRandomNumber()
 	if err != nil {
 		p.Response.Status = http.StatusInternalServerError
@@ -163,6 +162,8 @@ func (p Profiles) SendVerificationCodeForChangePassword() revel.Result {
 	}
 
 	verificationCode := fmt.Sprintf("%06d", randomNumber)
+	pdata, _ := models.GetProfileLoginData(profile.Login)
+	sUserID := fmt.Sprintf("%d", pdata.ID)
 	SetChangePasswordCode(sUserID, verificationCode, 5*time.Minute)
 
 	err = smtp.SendMessage(profile.Login, "Смена пароля", verificationCode)
@@ -176,13 +177,8 @@ func (p Profiles) SendVerificationCodeForChangePassword() revel.Result {
 }
 
 func (p Profiles) VerifyAndChangePassword() revel.Result {
-	userID, err := middleware.ValidateJWT(p.Request, "auth_token")
-	if err != nil {
-		return p.Redirect("/login")
-	}
-	sUserID := fmt.Sprintf("%d", userID)
 	var vprofile = new(models.VerifyProfile)
-	err = p.Params.BindJSON(vprofile)
+	err := p.Params.BindJSON(vprofile)
 	if err != nil {
 		p.Response.Status = http.StatusBadRequest
 		return p.RenderJSON(map[string]string{"error": "Неверный запрос"})
@@ -194,6 +190,9 @@ func (p Profiles) VerifyAndChangePassword() revel.Result {
 		revel.AppLog.Error(err.Error())
 		return p.RenderJSON(map[string]string{"error": err.Error()})
 	}
+	revel.AppLog.Debugf("%v\n", vprofile)
+	pdata, _ := models.GetProfileLoginData(vprofile.Profile.Login)
+	sUserID := fmt.Sprintf("%d", pdata.ID)
 	changePasswordCode, ok := GetChangePasswordCode(sUserID)
 	if !ok {
 		p.Response.Status = http.StatusNotFound
@@ -210,7 +209,7 @@ func (p Profiles) VerifyAndChangePassword() revel.Result {
 		return p.RenderJSON(map[string]string{"error": err.Error()})
 	}
 	vprofile.Profile.Password = hashPassword
-	err = models.UpdateProfileByID(userID, &vprofile.Profile)
+	err = models.UpdateProfileByID(pdata.ID, &vprofile.Profile)
 	if err != nil {
 		p.Response.Status = http.StatusInternalServerError
 		revel.AppLog.Error(err.Error())

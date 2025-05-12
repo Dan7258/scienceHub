@@ -99,6 +99,23 @@
         .register-link a:hover {
             text-decoration: underline;
         }
+
+        .forgot-password-link {
+            text-align: center;
+            margin-top: 15px;
+            font-size: 15px;
+            color: #2c3e50;
+        }
+
+        .forgot-password-link a {
+            color: #4D38D7;
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .forgot-password-link a:hover {
+            text-decoration: underline;
+        }
         .error {
             color: #e74c3c;
             font-size: 14px;
@@ -159,6 +176,9 @@
 
     <div class="register-link">
         Нет аккаунта? <a href="/register">Зарегистрироваться</a>
+    </div>
+    <div class="forgot-password-link">
+        <a href="/change-password">Забыли пароль?</a>
     </div>
 
     <div id="error-message" class="error-message" style="color: red; margin-top: 15px; display: none;"></div>
@@ -288,6 +308,5 @@
         errorElement.style.display = 'block';
     }
 </script>
-<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'933004401b78b063',t:'MTc0NTEwMzYxMC4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script>
 </body>
 </html>

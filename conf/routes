@@ -34,6 +34,7 @@ GET     /profile                                    Profiles.ShowUserProfile
 GET     /login                                      Profiles.ShowLoginPage
 GET     /logout                                     Profiles.Logout
 GET     /register                                   Profiles.ShowRegisterPage
+GET     /change-password                            Profiles.ShowChangePasswordPage
 POST    /login                                      Profiles.Login
 POST    /register                                   Profiles.VerifyAndCreateUser
 POST    /send-verification-code-for-register        Profiles.SendVerificationCodeForRegister

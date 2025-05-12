@@ -14,6 +14,9 @@ func (a Admins) ShowLoginAdminPage() revel.Result {
 func (p Profiles) ShowRegisterPage() revel.Result {
 	return p.RenderTemplate("register.html")
 }
+func (p Profiles) ShowChangePasswordPage() revel.Result {
+	return p.RenderTemplate("change_password.html")
+}
 func (o OpenID) ShowCallbackYAPage() revel.Result {
 	return o.RenderTemplate("callback_ya.html")
 }

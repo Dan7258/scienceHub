@@ -3,6 +3,24 @@
 <head>
     <meta charset="UTF-8">
     <title>Yandex Login Callback</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #f0f0f0;
+        }
+        .message {
+            text-align: center;
+            padding: 20px;
+            background-color: white;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+    </style>
     <script>
         // Функция, которая извлекает токен из URL и передает его на сервер
         function handleYandexCallback() {
@@ -26,7 +44,6 @@
                 sendTokenToServer(accessToken, tokenType, expiresIn, cid);
             } else {
                 console.error('Access token not found in URL');
-                // Можно добавить обработку ошибки для пользователя
                 document.body.innerHTML = '<h1>Error: Access token not found</h1>';
             }
         }
@@ -55,9 +72,9 @@
                     console.log('Success:', data);
                     // Отправляем сообщение в основное окно
                     if (window.opener) {
-                        window.opener.postMessage({ type: 'yandex_auth_success' }, 'http://localhost:9000');
+                        window.opener.postMessage({ type: 'yandex_auth_success' }, 'https://sciencehub.tech');
                         // Закрываем окно Яндекс ID
-                        window.close();
+                        // window.close();
                     } else {
                         // Если окно не является всплывающим, перенаправляем
                         window.location.href = data.redirect_url || '/profile';
@@ -74,5 +91,9 @@
     </script>
 </head>
 <body>
+<div class="message">
+    <h1>Вы авторизованы</h1>
+    <p>Можете закрыть эту страницу</p>
+</div>
 </body>
 </html>

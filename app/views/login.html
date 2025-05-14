@@ -191,9 +191,9 @@
             {
                 client_id: "f4a7ab213914437080db918778a0705d",
                 response_type: "token",
-                redirect_uri: "http://localhost:9000/callback-ya"
+                redirect_uri: "https://sciencehub.tech/callback-ya"
             },
-            "http://localhost",
+            "https://sciencehub.tech",
             {
                 view: "button",
                 parentId: "buttonContainerId",
@@ -217,7 +217,7 @@
     };
     // Слушатель сообщений от callback_ya.html
     window.addEventListener('message', function(event) {
-        if (event.origin !== 'http://localhost:9000') return; // Проверяем источник
+        if (event.origin !== 'https://sciencehub.tech') return; // Проверяем источник
         if (event.data.type === 'yandex_auth_success') {
             // Перенаправляем на /profile
             window.location.href = '/profile';

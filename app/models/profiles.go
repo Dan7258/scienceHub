@@ -139,7 +139,7 @@ func GetAuthorsWithSearchParams(searchData SearchDataForProfiles) ([]Profiles, e
 			query.Or("id = ?", id)
 		}
 	}
-	err := query.Find(&profiles).Limit(searchData.Count).Error
+	err := query.Limit(searchData.Count).Find(&profiles).Error
 	return profiles, err
 }
 

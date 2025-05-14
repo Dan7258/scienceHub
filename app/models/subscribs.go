@@ -66,7 +66,7 @@ func GetMySubscribersWithSearchParams(profileID uint64, searchData SearchDataFor
 			query.Or("profiles.id = ?", id)
 		}
 	}
-	err := query.Find(&subscribers).Limit(searchData.Count).Error
+	err := query.Limit(searchData.Count).Find(&subscribers).Error
 	return subscribers, err
 }
 
@@ -94,6 +94,6 @@ func GetMySubscribesWithSearchParams(profileID uint64, searchData SearchDataForP
 			query.Or("profiles.id = ?", id)
 		}
 	}
-	err := query.Find(&subscribers).Limit(searchData.Count).Error
+	err := query.Limit(searchData.Count).Find(&subscribers).Error
 	return subscribers, err
 }

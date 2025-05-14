@@ -8,7 +8,6 @@ import (
 	"github.com/revel/revel"
 	"os"
 	"path"
-	"strings"
 	"time"
 )
 
@@ -35,8 +34,7 @@ func PutFileInMINIO(filePath string) (string, error) {
 		return "", err
 	}
 	revel.AppLog.Debugf("Successfully uploaded file %s", filePath)
-	port := strings.Split(os.Getenv("S3_HOST"), ":")[1]
-	fileLink := fmt.Sprintf("http://localhost:%s/%s/%s", port, os.Getenv("S3_BUCKET_NAME"), fileName)
+	fileLink := fmt.Sprintf("https://sciencehub.tech/minio/%s/%s", os.Getenv("S3_BUCKET_NAME"), fileName)
 	return fileLink, nil
 }
 

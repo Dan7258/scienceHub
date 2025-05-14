@@ -1,99 +1,27 @@
-<!DOCTYPE html>
-<html lang="en">
+<!doctype html>
+<html lang="ru">
+
 <head>
-    <meta charset="UTF-8">
-    <title>Yandex Login Callback</title>
+    <meta charSet="utf-8" />
+    <meta name='viewport' content='width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, shrink-to-fit=no, viewport-fit=cover'>
+    <meta http-equiv='X-UA-Compatible' content='ie=edge'>
     <style>
+        html,
         body {
-            font-family: Arial, sans-serif;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            margin: 0;
-            background-color: #f0f0f0;
-        }
-        .message {
-            text-align: center;
-            padding: 20px;
-            background-color: white;
-            border-radius: 5px;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            background: #eee;
         }
     </style>
-    <script>
-        // Функция, которая извлекает токен из URL и передает его на сервер
-        function handleYandexCallback() {
-            // Получаем hash часть URL (все после #)
-            const hash = window.location.hash.substring(1);
-
-            // Парсим параметры из hash
-            const params = new URLSearchParams(hash);
-            const accessToken = params.get('access_token');
-            const tokenType = params.get('token_type');
-            const expiresIn = params.get('expires_in');
-            const cid = params.get('cid');
-
-            if (accessToken) {
-                console.log('Access Token:', accessToken);
-                console.log('Token Type:', tokenType);
-                console.log('Expires In:', expiresIn);
-                console.log('CID:', cid);
-
-                // Отправка токена на сервер через POST
-                sendTokenToServer(accessToken, tokenType, expiresIn, cid);
-            } else {
-                console.error('Access token not found in URL');
-                document.body.innerHTML = '<h1>Error: Access token not found</h1>';
-            }
-        }
-
-        // Функция для отправки токена на сервер
-        function sendTokenToServer(token, tokenType, expiresIn, cid) {
-            fetch('/token-ya', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    access_token: token,
-                    token_type: tokenType,
-                    expires_in: expiresIn,
-                    cid: cid
-                })
-            })
-                .then(response => {
-                    if (!response.ok) {
-                        throw new Error('Network response was not ok');
-                    }
-                    return response.json();
-                })
-                .then(data => {
-                    console.log('Success:', data);
-                    // Отправляем сообщение в основное окно
-                    if (window.opener) {
-                        window.opener.postMessage({ type: 'yandex_auth_success' }, 'https://sciencehub.tech');
-                        // Закрываем окно Яндекс ID
-                        // window.close();
-                    } else {
-                        // Если окно не является всплывающим, перенаправляем
-                        window.location.href = data.redirect_url || '/profile';
-                    }
-                })
-                .catch((error) => {
-                    console.error('Error:', error);
-                    document.body.innerHTML = `<h1>Error: ${error.message}</h1>`;
-                });
-        }
-
-        // Вызываем функцию при загрузке страницы
-        window.onload = handleYandexCallback;
-    </script>
+    <script src="https://yastatic.net/s3/passport-sdk/autofill/v1/sdk-suggest-token-with-polyfills-latest.js"></script>
 </head>
+
 <body>
-<div class="message">
-    <h1>Вы авторизованы</h1>
-    <p>Можете закрыть эту страницу</p>
-</div>
+<script>
+    window.onload = function() {
+        window.YaSendSuggestToken("https://sciencehub.tech/login", {
+            "kek": true
+        });
+    };
+</script>
 </body>
+
 </html>

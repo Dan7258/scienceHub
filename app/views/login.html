@@ -193,7 +193,7 @@
                 response_type: "token",
                 redirect_uri: "https://sciencehub.tech/callback-ya"
             },
-            "https://sciencehub.tech",
+            "https://sciencehub.tech/login",
             {
                 view: "button",
                 parentId: "buttonContainerId",
@@ -207,22 +207,35 @@
             .then(({ handler }) => handler())
             .then(data => {
                 console.log('Сообщение с токеном', data);
-                // Здесь можно отправить токен на сервер для авторизации
-                handleYandexLogin(data.access_token);
+                sendTokenToServer(data);
             })
             .catch(error => {
                 console.log('Обработка ошибки', error);
                 showError('Ошибка при входе через Яндекс');
             });
     };
-    // Слушатель сообщений от callback_ya.html
-    window.addEventListener('message', function(event) {
-        if (event.origin !== 'https://sciencehub.tech') return; // Проверяем источник
-        if (event.data.type === 'yandex_auth_success') {
-            // Перенаправляем на /profile
-            window.location.href = '/profile';
-        }
-    });
+    function sendTokenToServer(data) {
+        fetch('/token-ya', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                access_token: data.access_token,
+                token_type: data.token_type,
+                expires_in: data.expires_in,
+                cid: data.cid
+            })
+        })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                } else {
+                    window.location.href = '/profile';
+                }
+            })
+
+    }
 
 
     // Функции для работы меню
@@ -310,3 +323,10 @@
 </script>
 </body>
 </html>
+
+
+
+
+
+
+

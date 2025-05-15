@@ -132,10 +132,8 @@ func (o OpenID) GetCodeForVKToken() revel.Result {
 	}
 	userdata := new(UserDataVK)
 	body, _ := io.ReadAll(resp.Body)
+	err = json.Unmarshal(body, userdata)
 
-	fmt.Println(string(body))
-	fmt.Println(userdata)
-	err = json.NewDecoder(resp.Body).Decode(userdata)
 	if err != nil {
 		return o.RenderJSON(map[string]string{"error": "Failed to read response: " + err.Error()})
 	}

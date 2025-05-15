@@ -33,4 +33,4 @@ COPY --from=builder /app /app
 
 EXPOSE 9000
 
-CMD ["revel", "run", ".", "prod"]
+CMD ["revel", "run", "."]

@@ -105,6 +105,47 @@ func (o OpenID) RegisterWithYA(userdata *UserData) error {
 	return nil
 }
 
+func (o OpenID) GetCodeForVKToken() revel.Result {
+	accessToken := new(AccessToken)
+	err := o.Params.BindJSON(accessToken)
+	if err != nil {
+		return o.RenderJSON(map[string]string{"error": err.Error()})
+	}
+	req, err := http.NewRequest("GET", "https://login.yandex.ru/info?format=json", nil)
+	if err != nil {
+		return o.RenderJSON(map[string]string{"error": err.Error()})
+	}
+	req.Header.Set("Authorization", "OAuth "+accessToken.AccessToken)
+	client := new(http.Client)
+	resp, err := client.Do(req)
+	if err != nil {
+		return o.RenderJSON(map[string]string{"error": err.Error()})
+	}
+	defer resp.Body.Close()
+	if resp.StatusCode != http.StatusOK {
+		return o.RenderJSON(map[string]string{"error": fmt.Sprintf("API error: %s", resp.Status)})
+	}
+	userdata := new(UserData)
+
+	err = json.NewDecoder(resp.Body).Decode(userdata)
+	if err != nil {
+		return o.RenderJSON(map[string]string{"error": "Failed to read response: " + err.Error()})
+	}
+	if !models.ThsProfilesIsExist(userdata.DefaultEmail) {
+		err = o.RegisterWithYA(userdata)
+	}
+	if err != nil {
+		return o.RenderJSON(map[string]string{"error": err.Error()})
+	}
+	err = o.LoginWithYA(userdata)
+	if err != nil {
+		return o.RenderJSON(map[string]string{"error": err.Error()})
+	}
+
+	return o.RenderJSON(map[string]int{"status": http.StatusOK})
+
+}
+
 func (o OpenID) GeneratePassword(length uint64) string {
 	data := "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*()_+"
 	password := ""

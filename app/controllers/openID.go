@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/revel/revel"
+	"io"
 	"math/big"
 	"net/http"
 	"net/url"
@@ -29,6 +30,10 @@ type UserDataYA struct {
 }
 
 type UserDataVK struct {
+	User UserVK `json:"user"`
+}
+
+type UserVK struct {
 	Email     string `json:"email"`
 	FirstName string `json:"first_name"`
 	LastName  string `json:"last_name"`
@@ -126,19 +131,21 @@ func (o OpenID) GetCodeForVKToken() revel.Result {
 		return o.RenderJSON(map[string]string{"error": fmt.Sprintf("API error: %s", resp.Status)})
 	}
 	userdata := new(UserDataVK)
-	fmt.Println(resp.Body)
+	body, _ := io.ReadAll(resp.Body)
+
+	fmt.Println(string(body))
 	fmt.Println(userdata)
 	err = json.NewDecoder(resp.Body).Decode(userdata)
 	if err != nil {
 		return o.RenderJSON(map[string]string{"error": "Failed to read response: " + err.Error()})
 	}
-	if !models.ThsProfilesIsExist(userdata.Email) {
+	if !models.ThsProfilesIsExist(userdata.User.Email) {
 		err = o.RegisterWithVK(*userdata)
 	}
 	if err != nil {
 		return o.RenderJSON(map[string]string{"error": err.Error()})
 	}
-	err = o.LoginWithOpenID(userdata.Email)
+	err = o.LoginWithOpenID(userdata.User.Email)
 	if err != nil {
 		return o.RenderJSON(map[string]string{"error": err.Error()})
 	}
@@ -149,9 +156,9 @@ func (o OpenID) GetCodeForVKToken() revel.Result {
 
 func (o OpenID) RegisterWithVK(userdata UserDataVK) error {
 	profile := new(models.Profiles)
-	profile.Login = userdata.Email
-	profile.FirstName = userdata.FirstName
-	profile.LastName = userdata.LastName
+	profile.Login = userdata.User.Email
+	profile.FirstName = userdata.User.FirstName
+	profile.LastName = userdata.User.LastName
 	pass := o.GeneratePassword(12)
 	hpass, err := middleware.HashPassword(pass)
 	if err != nil {

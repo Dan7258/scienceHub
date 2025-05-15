@@ -36,17 +36,17 @@ func InitDB() {
 	fmt.Println("Connected to the database successfully!")
 
 	// Получаем список таблиц
-	var tables []string
-	result := DB.Raw("SELECT tablename FROM pg_tables WHERE schemaname = 'public'").Scan(&tables)
-	if result.Error != nil {
-		fmt.Println("Error fetching tables:", result.Error)
-		return
-	}
-
-	fmt.Println("Tables in the database:")
-	for _, table := range tables {
-		fmt.Println("-", table)
-	}
+	//var tables []string
+	//result := DB.Raw("SELECT tablename FROM pg_tables WHERE schemaname = 'public'").Scan(&tables)
+	//if result.Error != nil {
+	//	fmt.Println("Error fetching tables:", result.Error)
+	//	return
+	//}
+	//
+	//fmt.Println("Tables in the database:")
+	//for _, table := range tables {
+	//	fmt.Println("-", table)
+	//}
 }
 
 func InitRDB() {

@@ -1,10 +1,9 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-    <meta charset="UTF-8">
+    <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Вход</title>
-    <!-- Добавляем скрипт Яндекс -->
     <script src="https://yastatic.net/s3/passport-sdk/autofill/v1/sdk-suggest-with-polyfills-latest.js"></script>
     <style>
         body {
@@ -148,7 +147,7 @@
 </head>
 
 <body>
-{{template "header.html" .}}
+{{template "header.html"}}
 <div class="login-container">
     <div class="login-header">
         <h1>Вход</h1>
@@ -400,136 +399,3 @@
 </script>
 </body>
 </html>
-
-login:1 [DOM] Input elements should have autocomplete attributes (suggested: "current-password"): (More info: https://goo.gl/9p2vKq) <input type=​"password" id=​"password" name=​"password" placeholder=​"ваш пароль" required>​
-tag.js:99 Refused to connect to 'https://mc.yandex.com/watch/69331741?wmode=7&page-url=https%3A%2F%2Fautofill.yandex.ru%2Fsuggest%2Fbutton%3Fclient_id%3Df4a7ab213914437080db918778a0705d%26response_type%3Dtoken%26redirect_uri%3Dhttps%253A%252F%252Fsciencehub.tech%252Fcallback-ya%26location%3Dhttps%253A%252F%252Fsciencehub.tech%252Flogin%26theme%3Dlight%26version%3D1.76.5%26widget_kind%3Dbutton%26ym_uid%3D1747239913730522158%26source_id%3D%26uuid%3D20180d3c-fd0f-416f-ad27-7c46020d7657%26button_view%3Dadditional%26button_theme%3Ddark%26butto...en%3Autf-8%3Ala%3Aru%3Av%3A2030%3Acn%3A1%3Adp%3A0%3Als%3A941356117024%3Ahid%3A851417761%3Az%3A180%3Ai%3A20250515172102%3Aet%3A1747318862%3Ac%3A1%3Arn%3A312724563%3Arqn%3A57%3Au%3A1657282477515253143%3Aw%3A0x0%3As%3A1920x1080x24%3Ask%3A1%3Aifr%3A1%3Awv%3A2%3Ads%3A0%2C240%2C155%2C1%2C5%2C0%2C%2C419%2C0%2C%2C%2C%2C883%3Aco%3A0%3Acpf%3A1%3Antf%3A1%3Aeu%3A1%3Ans%3A1747318860933%3Aadb%3A2%3Arqnl%3A1%3Ast%3A1747318862%3At%3A&t=gdpr(13-0)clc(0-0-0)rqnt(1)aw(1)rcm(1)yu(5161652581685966015)cdl(na)eco(42140164)ti(1)' because it violates the following Content Security Policy directive: "connect-src 'self' mc.yandex.ru suggest-maps.yandex.net https://gc.kis.v2.scr.kaspersky-labs.com wss://gc.kis.v2.scr.kaspersky-labs.com".
-
-xh @ tag.js:99
-Oe @ tag.js:53
-(anonymous) @ tag.js:54
-(anonymous) @ tag.js:58
-Promise.then
-(anonymous) @ tag.js:58
-(anonymous) @ tag.js:58
-(anonymous) @ tag.js:105
-(anonymous) @ tag.js:109
-(anonymous) @ tag.js:60
-(anonymous) @ tag.js:60
-(anonymous) @ tag.js:164
-f @ tag.js:578
-(anonymous) @ tag.js:579
-(anonymous) @ tag.js:60
-zx @ tag.js:579
-(anonymous) @ suggest-button.js:2
-di @ tag.js:110
-(anonymous) @ tag.js:110
-L @ tag.js:16
-(anonymous) @ tag.js:110
-(anonymous) @ tag.js:60
-(anonymous) @ tag.js:60
-(anonymous) @ tag.js:579
-(anonymous) @ tag.js:580
-tag.js:99 Fetch API cannot load https://mc.yandex.com/watch/69331741?wmode=7&page-url=https%3A%2F%2Fautofill.yandex.ru%2Fsuggest%2Fbutton%3Fclient_id%3Df4a7ab213914437080db918778a0705d%26response_type%3Dtoken%26redirect_uri%3Dhttps%253A%252F%252Fsciencehub.tech%252Fcallback-ya%26location%3Dhttps%253A%252F%252Fsciencehub.tech%252Flogin%26theme%3Dlight%26version%3D1.76.5%26widget_kind%3Dbutton%26ym_uid%3D1747239913730522158%26source_id%3D%26uuid%3D20180d3c-fd0f-416f-ad27-7c46020d7657%26button_view%3Dadditional%26button_theme%3Ddark%26butto...en%3Autf-8%3Ala%3Aru%3Av%3A2030%3Acn%3A1%3Adp%3A0%3Als%3A941356117024%3Ahid%3A851417761%3Az%3A180%3Ai%3A20250515172102%3Aet%3A1747318862%3Ac%3A1%3Arn%3A312724563%3Arqn%3A57%3Au%3A1657282477515253143%3Aw%3A0x0%3As%3A1920x1080x24%3Ask%3A1%3Aifr%3A1%3Awv%3A2%3Ads%3A0%2C240%2C155%2C1%2C5%2C0%2C%2C419%2C0%2C%2C%2C%2C883%3Aco%3A0%3Acpf%3A1%3Antf%3A1%3Aeu%3A1%3Ans%3A1747318860933%3Aadb%3A2%3Arqnl%3A1%3Ast%3A1747318862%3At%3A&t=gdpr(13-0)clc(0-0-0)rqnt(1)aw(1)rcm(1)yu(5161652581685966015)cdl(na)eco(42140164)ti(1). Refused to connect because it violates the document's Content Security Policy.
-xh @ tag.js:99
-Oe @ tag.js:53
-(anonymous) @ tag.js:54
-(anonymous) @ tag.js:58
-Promise.then
-(anonymous) @ tag.js:58
-(anonymous) @ tag.js:58
-(anonymous) @ tag.js:105
-(anonymous) @ tag.js:109
-(anonymous) @ tag.js:60
-(anonymous) @ tag.js:60
-(anonymous) @ tag.js:164
-f @ tag.js:578
-(anonymous) @ tag.js:579
-(anonymous) @ tag.js:60
-zx @ tag.js:579
-(anonymous) @ suggest-button.js:2
-di @ tag.js:110
-(anonymous) @ tag.js:110
-L @ tag.js:16
-(anonymous) @ tag.js:110
-(anonymous) @ tag.js:60
-(anonymous) @ tag.js:60
-(anonymous) @ tag.js:579
-(anonymous) @ tag.js:580
-tag.js:101 Refused to connect to 'https://mc.yandex.com/watch/69331741?wmode=7&page-url=https%3A%2F%2Fautofill.yandex.ru%2Fsuggest%2Fbutton%3Fclient_id%3Df4a7ab213914437080db918778a0705d%26response_type%3Dtoken%26redirect_uri%3Dhttps%253A%252F%252Fsciencehub.tech%252Fcallback-ya%26location%3Dhttps%253A%252F%252Fsciencehub.tech%252Flogin%26theme%3Dlight%26version%3D1.76.5%26widget_kind%3Dbutton%26ym_uid%3D1747239913730522158%26source_id%3D%26uuid%3D20180d3c-fd0f-416f-ad27-7c46020d7657%26button_view%3Dadditional%26button_theme%3Ddark%26butto...en%3Autf-8%3Ala%3Aru%3Av%3A2030%3Acn%3A1%3Adp%3A0%3Als%3A941356117024%3Ahid%3A851417761%3Az%3A180%3Ai%3A20250515172102%3Aet%3A1747318862%3Ac%3A1%3Arn%3A312724563%3Arqn%3A57%3Au%3A1657282477515253143%3Aw%3A0x0%3As%3A1920x1080x24%3Ask%3A1%3Aifr%3A1%3Awv%3A2%3Ads%3A0%2C240%2C155%2C1%2C5%2C0%2C%2C419%2C0%2C%2C%2C%2C883%3Aco%3A0%3Acpf%3A1%3Antf%3A1%3Aeu%3A1%3Ans%3A1747318860933%3Aadb%3A2%3Arqnl%3A1%3Ast%3A1747318862%3At%3A&t=gdpr(13-0)clc(0-0-0)rqnt(1)aw(1)rcm(1)yu(5161652581685966015)cdl(na)eco(42140164)ti(2)' because it violates the following Content Security Policy directive: "connect-src 'self' mc.yandex.ru suggest-maps.yandex.net https://gc.kis.v2.scr.kaspersky-labs.com wss://gc.kis.v2.scr.kaspersky-labs.com".
-
-(anonymous) @ tag.js:101
-hd @ tag.js:33
-Ah @ tag.js:101
-Oe @ tag.js:53
-(anonymous) @ tag.js:54
-Promise.catch
-Oe @ tag.js:54
-(anonymous) @ tag.js:54
-(anonymous) @ tag.js:58
-Promise.then
-(anonymous) @ tag.js:58
-(anonymous) @ tag.js:58
-(anonymous) @ tag.js:105
-(anonymous) @ tag.js:109
-(anonymous) @ tag.js:60
-(anonymous) @ tag.js:60
-(anonymous) @ tag.js:164
-f @ tag.js:578
-(anonymous) @ tag.js:579
-(anonymous) @ tag.js:60
-zx @ tag.js:579
-(anonymous) @ suggest-button.js:2
-di @ tag.js:110
-(anonymous) @ tag.js:110
-L @ tag.js:16
-(anonymous) @ tag.js:110
-(anonymous) @ tag.js:60
-(anonymous) @ tag.js:60
-(anonymous) @ tag.js:579
-(anonymous) @ tag.js:580
-tag.js:96 Refused to load the script 'https://mc.yandex.com/watch/69331741?callback=_ymjsp898728138&page-url=https%3A%2F%2Fautofill.yandex.ru%2Fsuggest%2Fbutton%3Fclient_id%3Df4a7ab213914437080db918778a0705d%26response_type%3Dtoken%26redirect_uri%3Dhttps%253A%252F%252Fsciencehub.tech%252Fcallback-ya%26location%3Dhttps%253A%252F%252Fsciencehub.tech%252Flogin%26theme%3Dlight%26version%3D1.76.5%26widget_kind%3Dbutton%26ym_uid%3D1747239913730522158%26source_id%3D%26uuid%3D20180d3c-fd0f-416f-ad27-7c46020d7657%26button_view%3Dadditional%26button_the...-8%3Ala%3Aru%3Av%3A2030%3Acn%3A1%3Adp%3A0%3Als%3A941356117024%3Ahid%3A851417761%3Az%3A180%3Ai%3A20250515172102%3Aet%3A1747318862%3Ac%3A1%3Arn%3A312724563%3Arqn%3A57%3Au%3A1657282477515253143%3Aw%3A0x0%3As%3A1920x1080x24%3Ask%3A1%3Aifr%3A1%3Awv%3A2%3Ads%3A0%2C240%2C155%2C1%2C5%2C0%2C%2C419%2C0%2C%2C%2C%2C883%3Aco%3A0%3Acpf%3A1%3Antf%3A1%3Aeu%3A1%3Ans%3A1747318860933%3Aadb%3A2%3Arqnl%3A1%3Ast%3A1747318862%3At%3A&t=gdpr(13-0)clc(0-0-0)rqnt(1)aw(1)rcm(1)yu(5161652581685966015)cdl(na)eco(42140164)ti(3)&wmode=5' because it violates the following Content Security Policy directive: "script-src 'self' 'unsafe-eval' 'unsafe-inline' 'nonce-F2RfPnfDN5a45h+Ci0wcnA==' mc.yandex.md mc.yandex.ru yastatic.net https://gc.kis.v2.scr.kaspersky-labs.com wss://gc.kis.v2.scr.kaspersky-labs.com". Note that 'script-src-elem' was not explicitly set, so 'script-src' is used as a fallback.
-
-ph @ tag.js:96
-(anonymous) @ tag.js:98
-hd @ tag.js:33
-wh @ tag.js:98
-Oe @ tag.js:53
-(anonymous) @ tag.js:54
-Promise.catch
-Oe @ tag.js:54
-(anonymous) @ tag.js:54
-Promise.catch
-Oe @ tag.js:54
-(anonymous) @ tag.js:54
-(anonymous) @ tag.js:58
-Promise.then
-(anonymous) @ tag.js:58
-(anonymous) @ tag.js:58
-(anonymous) @ tag.js:105
-(anonymous) @ tag.js:109
-(anonymous) @ tag.js:60
-(anonymous) @ tag.js:60
-(anonymous) @ tag.js:164
-f @ tag.js:578
-(anonymous) @ tag.js:579
-(anonymous) @ tag.js:60
-zx @ tag.js:579
-(anonymous) @ suggest-button.js:2
-di @ tag.js:110
-(anonymous) @ tag.js:110
-L @ tag.js:16
-(anonymous) @ tag.js:110
-(anonymous) @ tag.js:60
-(anonymous) @ tag.js:60
-(anonymous) @ tag.js:579
-(anonymous) @ tag.js:580
-mc.yandex.ru/:1 Refused to frame 'https://mc.yandex.com/' because it violates the following Content Security Policy directive: "frame-src 'self' mc.yandex.md mc.yandex.ru yandex.ru passport.yandex.ru oauth.yandex.ru yango.com passport.yango.com oauth.yango.com https://gc.kis.v2.scr.kaspersky-labs.com wss://gc.kis.v2.scr.kaspersky-labs.com".
-
-login:430 {refresh_token: 'vk2.a.lqrqRjxshLUBtjmRAKPR_bELsndhC5KhIhaZZ1sHw82W…xwdPpDDno520jRAK9yJUnZjgdr_RKOVeyTUpT1jl-ZXBsGCg5', access_token: 'vk2.a.MoZYj5KqbGB_bM0ka_bo4jrmNKQWwpjNjxaXR6cBtwNK…D2QY0d1tYL4TaJmrlr4NvkKAuU3gICPWmHI5L5HK8Gp_01cNw', id_token: 'eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJpaXMiOiJWS…jWznqYBW0JxuNrU8m4vri7zq6l39MAdyScK23NKd-DFt7dqZo', token_type: 'Bearer', expires_in: 3600, …}
-
-
-
-
-
-
-

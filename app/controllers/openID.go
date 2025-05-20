@@ -60,8 +60,8 @@ func (o OpenID) GetCodeForYAToken() revel.Result {
 		return o.RenderJSON(map[string]string{"error": fmt.Sprintf("API error: %s", resp.Status)})
 	}
 	userdata := new(UserDataYA)
-
-	err = json.NewDecoder(resp.Body).Decode(userdata)
+	body, _ := io.ReadAll(resp.Body)
+	err = json.Unmarshal(body, userdata)
 	if err != nil {
 		return o.RenderJSON(map[string]string{"error": "Failed to read response: " + err.Error()})
 	}

@@ -23,7 +23,7 @@ VALUES ('admin', '$2a$10$4MJWcLMLTCoSBm9TZhmMAugp76gUU5zEuhA6T3IAfww3ZB.U2P/mO')
 CREATE TABLE publications (
     id SERIAL PRIMARY KEY,
     title VARCHAR(255) NOT NULL,
-    abstract VARCHAR(255) NOT NULL,
+    abstract TEXT NOT NULL,
     file_link VARCHAR(255) NOT NULL,
     created_at DATE NOT NULL,
     updated_at DATE NOT NULL,

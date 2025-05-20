@@ -20,9 +20,6 @@ func (p Profiles) ShowChangePasswordPage() revel.Result {
 func (o OpenID) ShowCallbackYAPage() revel.Result {
 	return o.RenderTemplate("callback_ya.html")
 }
-func (o OpenID) ShowCallbackVKPage() revel.Result {
-	return o.RenderTemplate("callback_vk.html")
-}
 
 func (p Profiles) ShowSettingsPage() revel.Result {
 	_, err := middleware.ValidateJWT(p.Request, "auth_token")

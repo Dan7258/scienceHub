@@ -64,7 +64,6 @@ GET     /logout-admin                               Admins.LogoutAdmin
 
 GET     /callback-ya                                OpenID.ShowCallbackYAPage
 POST    /token-ya                                   OpenID.GetCodeForYAToken
-GET     /callback-vk                                OpenID.ShowCallbackVKPage
 POST    /token-vk                                   OpenID.GetCodeForVKToken
 
 # Ignore favicon requests

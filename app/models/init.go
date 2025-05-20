@@ -3,7 +3,6 @@ package models
 import (
 	"context"
 	"fmt"
-	"github.com/elastic/go-elasticsearch/v8"
 	"github.com/minio/minio-go/v7"
 	"github.com/minio/minio-go/v7/pkg/credentials"
 	"github.com/redis/go-redis/v9"
@@ -17,7 +16,6 @@ import (
 var DB *gorm.DB
 var RDB *redis.Client
 var minioClient *minio.Client
-var ES *elasticsearch.Client
 
 func InitDB() {
 	dsn := fmt.Sprintf("host=%s user=%s password=%s dbname=%s port=%s sslmode=%s",

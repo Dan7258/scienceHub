@@ -162,8 +162,8 @@ func GetAuthorsWithSearchParams(data SearchDataForProfiles) (GetSearchingDataFro
 	}
 	err := query.Offset(data.Page * data.Count).Limit(data.Count).Find(&searchData.Data).Error
 	searchData.MaxPages = count / int64(data.Count)
-	if searchData.MaxPages <= 0 {
-		searchData.MaxPages = 1
+	if count%int64(data.Count) > 0 {
+		searchData.MaxPages++
 	}
 	return *searchData, err
 }

@@ -69,6 +69,36 @@
             border-color: var(--primary-color);
         }
 
+        .search-bar select {
+            padding: 0.75rem;
+            font-size: 1rem;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            outline: none;
+            transition: border-color 0.2s ease;
+            background: white;
+        }
+
+        .search-bar select:focus {
+            border-color: var(--primary-color);
+        }
+
+        .search-bar button {
+            padding: 0.75rem 1.5rem;
+            background: var(--error-color);
+            color: white;
+            border: none;
+            border-radius: 4px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+            white-space: nowrap;
+        }
+
+        .search-bar button:hover {
+            background: #c0392b;
+        }
+
         .author-card {
             background: #f9fafb;
             padding: 1.25rem;
@@ -134,6 +164,10 @@
         .pagination-controls {
             text-align: center;
             margin-top: 2rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 1rem;
         }
 
         .pagination-controls button {
@@ -156,6 +190,13 @@
             cursor: not-allowed;
         }
 
+        .page-info {
+            font-size: 1rem;
+            color: var(--text-color);
+            margin: 0 1rem;
+            min-width: 120px;
+        }
+
         @media (max-width: 768px) {
             .container {
                 padding: 1rem;
@@ -166,8 +207,15 @@
                 align-items: stretch;
             }
 
-            .search-bar input {
+            .search-bar input, .search-bar select, .search-bar button {
                 min-width: 100%;
+                width: 100%;
+                padding: 0.75rem;
+            }
+
+            .pagination-controls {
+                flex-direction: column;
+                gap: 0.5rem;
             }
         }
 
@@ -196,6 +244,19 @@
     <h1>Подписки</h1>
     <div class="search-bar">
         <input type="text" id="search-input" placeholder="Поиск по ID или ФИО">
+        <select id="sortSelect">
+            <option value="2" selected>По имени (А-Я)</option>
+            <option value="3">По имени (Я-А)</option>
+            <option value="1">По дате (новые)</option>
+            <option value="0">По дате (старые)</option>
+        </select>
+        <select id="countSelect">
+            <option value="5">5 на странице</option>
+            <option value="10" selected>10 на странице</option>
+            <option value="15">15 на странице</option>
+            <option value="20">20 на странице</option>
+        </select>
+        <button onclick="resetAll()">Сбросить всё</button>
     </div>
     <div id="authors">
         <div class="skeleton" style="width: 80%;"></div>
@@ -205,8 +266,8 @@
     </div>
     <div class="pagination-controls">
         <button id="prevPage" onclick="loadPreviousPage()" disabled>← Назад</button>
-        <span id="pageInfo" style="margin: 0 1rem; display: inline-block; min-width: 80px;">Страница 1</span>
-        <button id="nextPage" onclick="loadNextPage()">Вперёд →</button>
+        <span id="pageInfo" class="page-info">Страница 1 из 1</span>
+        <button id="nextPage" onclick="loadNextPage()" disabled>Вперёд →</button>
     </div>
 </div>
 
@@ -215,15 +276,28 @@
     let searchTimeout;
     let searchData = {
         stroke: "",
-        first_id: 0,
-        count: 2
+        page: 1,
+        count: 10,
+        sort: 2  // SortNameAsc - по умолчанию по имени А-Я
     };
-    let paginationHistory = [0];
-    let currentPage = 1;
+    let maxPages = 1;
 
     document.addEventListener("DOMContentLoaded", function() {
-        setTimeout(() => loadAuthors(true), 300);
+        setTimeout(() => loadAuthors(), 300);
+
         document.getElementById('search-input').addEventListener('input', handleSearchInput);
+
+        document.getElementById('sortSelect').addEventListener('change', function(e) {
+            searchData.sort = parseInt(e.target.value);
+            searchData.page = 1;
+            loadAuthors();
+        });
+
+        document.getElementById('countSelect').addEventListener('change', function(e) {
+            searchData.count = parseInt(e.target.value);
+            searchData.page = 1;
+            loadAuthors();
+        });
     });
 
     function handleSearchInput() {
@@ -231,7 +305,7 @@
         searchTimeout = setTimeout(searchAuthors, 500);
     }
 
-    function loadAuthors(isFirstLoad = false) {
+    function loadAuthors() {
         const authorsContainer = document.getElementById('authors');
         const prevButton = document.getElementById('prevPage');
         const nextButton = document.getElementById('nextPage');
@@ -266,22 +340,14 @@
                     throw new Error(`HTTP error! status: ${response.status}`);
                 }
 
-                const data = await response.json();
-                allAuthors = data;
+                const responseData = await response.json();
+                console.log('Loaded subscribes:', responseData);
 
-                if (isFirstLoad || searchData.first_id === 0) {
-                    paginationHistory = [0];
-                    currentPage = 1;
-                } else if (!paginationHistory.includes(searchData.first_id)) {
-                    paginationHistory.push(searchData.first_id);
-                    currentPage = paginationHistory.length;
-                }
+                allAuthors = responseData.data || [];
+                maxPages = responseData.max_pages || 1;
 
-                renderAuthors(data);
-
-                pageInfo.textContent = `Страница ${currentPage}`;
-                prevButton.disabled = paginationHistory.length <= 1;
-                nextButton.disabled = data.length < searchData.count || data.length === 0;
+                renderAuthors(allAuthors);
+                updatePaginationControls();
             })
             .catch(error => {
                 console.error('Ошибка при получении подписок:', error);
@@ -289,18 +355,26 @@
             });
     }
 
+    function updatePaginationControls() {
+        const prevButton = document.getElementById('prevPage');
+        const nextButton = document.getElementById('nextPage');
+        const pageInfo = document.getElementById('pageInfo');
+
+        pageInfo.textContent = `Страница ${searchData.page} из ${maxPages}`;
+        prevButton.disabled = searchData.page <= 1;
+        nextButton.disabled = searchData.page >= maxPages;
+    }
+
     function loadNextPage() {
-        if (allAuthors.length === searchData.count) {
-            const lastAuthor = allAuthors[allAuthors.length - 1];
-            searchData.first_id = lastAuthor.id;
+        if (searchData.page < maxPages) {
+            searchData.page++;
             loadAuthors();
         }
     }
 
     function loadPreviousPage() {
-        if (paginationHistory.length > 1) {
-            paginationHistory.pop();
-            searchData.first_id = paginationHistory[paginationHistory.length - 1];
+        if (searchData.page > 1) {
+            searchData.page--;
             loadAuthors();
         }
     }
@@ -350,10 +424,19 @@
         }
 
         searchData.stroke = searchQuery;
-        searchData.first_id = 0;
-        paginationHistory = [0];
-        currentPage = 1;
-        loadAuthors(true);
+        searchData.page = 1;
+        loadAuthors();
+    }
+
+    function resetAll() {
+        searchData.stroke = '';
+        searchData.page = 1;
+        searchData.sort = 2;  // SortNameAsc
+        searchData.count = 10;
+        document.getElementById('search-input').value = '';
+        document.getElementById('sortSelect').value = '2';
+        document.getElementById('countSelect').value = '10';
+        loadAuthors();
     }
 
     function escapeHtml(unsafe) {
@@ -371,7 +454,7 @@
         authorsContainer.innerHTML = `
             <div class="error-message">
                 Ошибка при загрузке подписок. Пожалуйста, попробуйте позже.
-                <button onclick="loadAuthors(true)" style="
+                <button onclick="loadAuthors()" style="
                     margin-top: 1rem;
                     padding: 0.5rem 1rem;
                     background: var(--primary-color);

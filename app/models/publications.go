@@ -148,6 +148,7 @@ func GetPublicationsWithSearchParams(data SearchDataForPublications) (GetSearchi
 		})
 
 	if query.Error != nil {
+		searchData.MaxPages = 9999
 		return *searchData, query.Error
 	}
 	if data.Tags != nil && len(data.Tags) > 0 {
@@ -169,8 +170,15 @@ func GetPublicationsWithSearchParams(data SearchDataForPublications) (GetSearchi
 		query = query.Order("created_at DESC")
 	}
 	query.Count(&count)
+	data.Page--
+	if data.Page < 0 {
+		data.Page = 0
+	}
 	err := query.Offset(data.Page * data.Count).Limit(data.Count).Find(&searchData.Data).Error
 	searchData.MaxPages = count / int64(data.Count)
+	if count%int64(data.Count) > 0 {
+		searchData.MaxPages++
+	}
 	return *searchData, err
 }
 

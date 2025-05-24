@@ -20,8 +20,9 @@ type Publications struct {
 }
 
 type Paginator struct {
-	FirstID int `json:"first_id"`
-	Count   int `json:"count"`
+	Page  int      `json:"page"`
+	Count int      `json:"count"`
+	Sort  TypeSort `json:"sort"`
 }
 
 type SearchDataForPublications struct {
@@ -30,13 +31,26 @@ type SearchDataForPublications struct {
 	Paginator
 }
 
+type GetSearchingDataFromPublications struct {
+	Data     []Publications `json:"data"`
+	MaxPages int64          `json:"max_pages"`
+}
+
 type TypeFile uint64
+type TypeSort int
 
 const (
 	Word TypeFile = iota
 	Exel
 	LibraWord
 	LibraExcel
+)
+
+const (
+	SortDateAsc TypeSort = iota
+	SortDateDesc
+	SortNameAsc
+	SortNameDesc
 )
 
 type PublicationDownloadFiltres struct {
@@ -123,37 +137,41 @@ func GetPublicationsByID(idList []uint64) ([]Publications, error) {
 	return publications, result.Error
 }
 
-func GetPublicationsWithSearchParams(data SearchDataForPublications) ([]Publications, error) {
-	publications := make([]Publications, 0)
-	query := DB.Model(new(Publications)).Distinct("publications.*").
+func GetPublicationsWithSearchParams(data SearchDataForPublications) (GetSearchingDataFromPublications, error) {
+	searchData := new(GetSearchingDataFromPublications)
+	searchData.Data = make([]Publications, 0)
+	var count int64
+	query := DB.Model(new(Publications)).
 		Preload("Tags").
 		Preload("Profiles", func(db *gorm.DB) *gorm.DB {
 			return db.Select("id, first_name, last_name, middle_name")
-		}).
-		Where("id >= ?", data.FirstID).
-		Order("created_at asc").
-		Limit(data.Count)
+		})
+
 	if query.Error != nil {
-		return nil, query.Error
+		return *searchData, query.Error
 	}
 	if data.Tags != nil && len(data.Tags) > 0 {
-		query.Joins("left join publication_tags on publication_tags.publications_id = publications.id").
+		query = query.Distinct().
+			Joins("left join publication_tags on publication_tags.publications_id = publications.id").
 			Where("publication_tags.tags_id IN (?)", data.Tags)
 	}
 	if data.Title != "" {
-		query.Where("title LIKE ?", fmt.Sprintf("%%%s%%", data.Title))
+		query.Where("title ILIKE ?", fmt.Sprintf("%%%s%%", data.Title))
 	}
-	err := query.Find(&publications).Error
-	return publications, err
-}
-
-func GetLastPublications(paginator Paginator) ([]Publications, error) {
-	publications := make([]Publications, 0)
-	result := DB.Model(new(Publications)).Preload("Tags").Preload("Profiles", func(db *gorm.DB) *gorm.DB {
-		return db.Select("id, first_name, last_name, middle_name")
-	}).Where("id >= ?", paginator.FirstID).Order("created_at asc").Limit(paginator.Count).Find(&publications)
-	fmt.Println(publications)
-	return publications, result.Error
+	switch data.Sort {
+	case SortNameAsc:
+		query = query.Order("publications.title ASC")
+	case SortNameDesc:
+		query = query.Order("publications.title DESC")
+	case SortDateAsc:
+		query = query.Order("created_at ASC")
+	default:
+		query = query.Order("created_at DESC")
+	}
+	query.Count(&count)
+	err := query.Offset(data.Page * data.Count).Limit(data.Count).Find(&searchData.Data).Error
+	searchData.MaxPages = count / int64(data.Count)
+	return *searchData, err
 }
 
 func GetAllPublications() ([]Publications, error) {
@@ -168,7 +186,6 @@ func GetAllPublications() ([]Publications, error) {
 }
 
 func AddTagsToPublication(ID uint64, tagIDs []uint64) error {
-
 	pub := new(Publications)
 	var tags []Tags
 	result := DB.First(pub, ID)

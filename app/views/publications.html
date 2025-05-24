@@ -89,6 +89,20 @@
             background: #2980b9;
         }
 
+        .search-bar select {
+            padding: 0.75rem;
+            font-size: 1rem;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            outline: none;
+            transition: border-color 0.2s ease;
+            background: white;
+        }
+
+        .search-bar select:focus {
+            border-color: var(--primary-color);
+        }
+
         .reset-all-button {
             background: var(--error-color) !important;
         }
@@ -109,6 +123,10 @@
         .pagination-controls {
             text-align: center;
             margin-top: 2rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 1rem;
         }
 
         .pagination-controls button {
@@ -129,6 +147,13 @@
         .pagination-controls button:disabled {
             background: var(--muted-text);
             cursor: not-allowed;
+        }
+
+        .page-info {
+            font-size: 1rem;
+            color: var(--text-color);
+            margin: 0 1rem;
+            min-width: 120px;
         }
 
         .publication h2 {
@@ -376,9 +401,14 @@
                 min-width: 100%;
             }
 
-            .search-bar button {
+            .search-bar button, .search-bar select {
                 width: 100%;
                 padding: 0.75rem;
+            }
+
+            .pagination-controls {
+                flex-direction: column;
+                gap: 0.5rem;
             }
         }
 
@@ -390,11 +420,16 @@
     </style>
 </head>
 <body>
-{{template "header.html"}}
 <div class="container">
     <h1>Публикации</h1>
     <div class="search-bar">
         <input type="text" id="searchInput" placeholder="Поиск публикаций...">
+        <select id="sortSelect">
+            <option value="created_at_desc">По дате (новые)</option>
+            <option value="created_at_asc">По дате (старые)</option>
+            <option value="title_asc">По названию (А-Я)</option>
+            <option value="title_desc">По названию (Я-А)</option>
+        </select>
         <button class="filter-button" onclick="openFilterModal()">Фильтры</button>
         <button class="reset-all-button" onclick="resetAll()">Сбросить всё</button>
     </div>
@@ -405,10 +440,10 @@
         <div class="skeleton" style="width: 70%; height: 100px;"></div>
         <div class="skeleton" style="width: 50%;"></div>
     </div>
-    <div class="pagination-controls" style="margin-top: 2rem; text-align: center;">
+    <div class="pagination-controls">
         <button id="prevPage" onclick="loadPreviousPage()" disabled>← Назад</button>
-        <span id="pageInfo" style="margin: 0 1rem; display: inline-block; min-width: 80px;">Страница 1</span>
-        <button id="nextPage" onclick="loadNextPage()">Вперёд →</button>
+        <span id="pageInfo" class="page-info">Страница 1 из 1</span>
+        <button id="nextPage" onclick="loadNextPage()" disabled>Вперёд →</button>
     </div>
 </div>
 
@@ -435,41 +470,43 @@
     let searchData = {
         title: "",
         tags: [],
-        first_id: 0,
-        count: 2
+        page: 1,
+        count: 10,
+        sort: "created_at_desc"
     };
-    let paginationHistory = [0];
-    let currentPage = 1;
+    let maxPages = 1;
 
     document.addEventListener("DOMContentLoaded", function() {
         closeFilterModal();
         setTimeout(() => {
-            loadPublicationsPaginated(true);
+            loadPublications();
             loadTags();
         }, 300);
 
         document.getElementById('searchInput').addEventListener('input', function(e) {
             const searchValue = e.target.value.trim();
             searchData.title = searchValue.length >= 2 ? searchValue : "";
-            searchData.first_id = 0;
-            paginationHistory = [0];
-            currentPage = 1;
-            loadPublicationsPaginated(true);
+            searchData.page = 1;
+            loadPublications();
         });
 
         document.getElementById('searchInput').addEventListener('keypress', function(e) {
             if (e.key === 'Enter') {
                 const searchValue = e.target.value.trim();
                 searchData.title = searchValue.length >= 2 ? searchValue : "";
-                searchData.first_id = 0;
-                paginationHistory = [0];
-                currentPage = 1;
-                loadPublicationsPaginated(true);
+                searchData.page = 1;
+                loadPublications();
             }
+        });
+
+        document.getElementById('sortSelect').addEventListener('change', function(e) {
+            searchData.sort = e.target.value;
+            searchData.page = 1;
+            loadPublications();
         });
     });
 
-    function loadPublicationsPaginated(isFirstLoad = false) {
+    function loadPublications() {
         const publicationsContainer = document.getElementById('publications');
         const prevButton = document.getElementById('prevPage');
         const nextButton = document.getElementById('nextPage');
@@ -506,23 +543,14 @@
                     throw new Error(`HTTP error! status: ${response.status}`);
                 }
 
-                const data = await response.json();
-                console.log('Loaded paginated publications:', data);
-                allPublications = data;
+                const responseData = await response.json();
+                console.log('Loaded publications:', responseData);
 
-                if (isFirstLoad || searchData.first_id === 0) {
-                    paginationHistory = [0];
-                    currentPage = 1;
-                } else if (!paginationHistory.includes(searchData.first_id)) {
-                    paginationHistory.push(searchData.first_id);
-                    currentPage = paginationHistory.length;
-                }
+                allPublications = responseData.data || [];
+                maxPages = responseData.max_pages || 1;
 
-                renderPublications(data);
-
-                pageInfo.textContent = `Страница ${currentPage}`;
-                prevButton.disabled = paginationHistory.length <= 1;
-                nextButton.disabled = data.length < searchData.count || data.length === 0;
+                renderPublications(allPublications);
+                updatePaginationControls();
             })
             .catch(error => {
                 console.error('Ошибка при получении публикаций:', error);
@@ -530,19 +558,27 @@
             });
     }
 
+    function updatePaginationControls() {
+        const prevButton = document.getElementById('prevPage');
+        const nextButton = document.getElementById('nextPage');
+        const pageInfo = document.getElementById('pageInfo');
+
+        pageInfo.textContent = `Страница ${searchData.page} из ${maxPages}`;
+        prevButton.disabled = searchData.page <= 1;
+        nextButton.disabled = searchData.page >= maxPages;
+    }
+
     function loadNextPage() {
-        if (allPublications.length === searchData.count) {
-            const lastPublication = allPublications[allPublications.length - 1];
-            searchData.first_id = lastPublication.id;
-            loadPublicationsPaginated();
+        if (searchData.page < maxPages) {
+            searchData.page++;
+            loadPublications();
         }
     }
 
     function loadPreviousPage() {
-        if (paginationHistory.length > 1) {
-            paginationHistory.pop();
-            searchData.first_id = paginationHistory[paginationHistory.length - 1];
-            loadPublicationsPaginated();
+        if (searchData.page > 1) {
+            searchData.page--;
+            loadPublications();
         }
     }
 
@@ -632,10 +668,8 @@
     function applyFilters() {
         closeFilterModal();
         searchData.tags = selectedTags.length > 0 ? selectedTags.map(Number) : [];
-        searchData.first_id = 0;
-        paginationHistory = [0];
-        currentPage = 1;
-        loadPublicationsPaginated(true);
+        searchData.page = 1;
+        loadPublications();
     }
 
     function resetFilters() {
@@ -647,11 +681,11 @@
         selectedTags = [];
         searchData.title = '';
         searchData.tags = [];
-        searchData.first_id = 0;
-        paginationHistory = [0];
-        currentPage = 1;
+        searchData.page = 1;
+        searchData.sort = 'created_at_desc';
         document.getElementById('searchInput').value = '';
-        loadPublicationsPaginated(true);
+        document.getElementById('sortSelect').value = 'created_at_desc';
+        loadPublications();
     }
 
     function openFilterModal() {
@@ -739,7 +773,7 @@
         publicationsContainer.innerHTML = `
             <p class="error-message">
                 Ошибка при загрузке публикаций. Пожалуйста, попробуйте позже.
-                <button onclick="loadPublicationsPaginated(true)" style="
+                <button onclick="loadPublications()" style="
                     margin-top: 1rem;
                     padding: 0.75rem 1.5rem;
                     background: var(--primary-color);
@@ -754,6 +788,14 @@
             </p>
         `;
     }
+
+    // Initialize tag search functionality
+    document.addEventListener('DOMContentLoaded', function() {
+        const tagSearch = document.getElementById('tagSearch');
+        if (tagSearch) {
+            tagSearch.addEventListener('input', filterTags);
+        }
+    });
 </script>
 </body>
 </html>

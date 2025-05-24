@@ -25,6 +25,11 @@ type Profiles struct {
 	MySubscribesList []Profiles     `gorm:"many2many:subscribs;joinForeignKey:subscribers_id;joinReferences:profiles_id"`
 }
 
+type GetSearchingDataFromProfiles struct {
+	Data     []Profiles `json:"data"`
+	MaxPages int64      `json:"max_pages"`
+}
+
 type ProfileWithSubscribitionStatus struct {
 	Profile      Profiles
 	Isubscribed  bool
@@ -106,7 +111,7 @@ func GetProfileLoginData(login string) (*Profiles, error) {
 
 func GetAllProfiles() ([]Profiles, error) {
 	var profiles []Profiles
-	result := DB.Select("id, first_name, last_name, middle_name, country, vac, appointment").
+	result := DB.Select("id, first_name, last_name, middle_name, country, academic_degree, vac, appointment").
 		Preload("Publications").
 		Preload("SubscribersList").
 		Preload("MySubscribesList").
@@ -118,15 +123,17 @@ func GetAllProfiles() ([]Profiles, error) {
 	return profiles, nil
 }
 
-func GetAuthorsWithSearchParams(searchData SearchDataForProfiles) ([]Profiles, error) {
-	var profiles []Profiles
-	words := strings.Split(searchData.Stroke, " ")
-	query := DB.Model(new(Profiles)).Select("id, first_name, last_name, middle_name, country, vac, appointment").
+func GetAuthorsWithSearchParams(data SearchDataForProfiles) (GetSearchingDataFromProfiles, error) {
+	searchData := new(GetSearchingDataFromProfiles)
+	searchData.Data = make([]Profiles, 0)
+	var count int64
+	query := DB.Model(new(Profiles)).Select("id, first_name, last_name, middle_name, country, academic_degree, vac, appointment").
 		Preload("Publications").
 		Preload("SubscribersList").
-		Preload("MySubscribesList").
-		Where("id >= ?", searchData.FirstID)
-	for i := 0; searchData.Stroke != "" && i < len(words); i++ {
+		Preload("MySubscribesList")
+
+	words := strings.Split(data.Stroke, " ")
+	for i := 0; data.Stroke != "" && i < len(words); i++ {
 		likeword := "%" + words[i] + "%"
 
 		if i == 0 {
@@ -139,8 +146,26 @@ func GetAuthorsWithSearchParams(searchData SearchDataForProfiles) ([]Profiles, e
 			query.Or("id = ?", id)
 		}
 	}
-	err := query.Limit(searchData.Count).Find(&profiles).Error
-	return profiles, err
+	switch data.Sort {
+	case SortNameAsc:
+		query = query.Order("last_name ASC")
+	default:
+		query = query.Order("last_name DESC")
+	}
+	if query.Error != nil {
+		return *searchData, query.Error
+	}
+	query.Count(&count)
+	data.Page--
+	if data.Page < 0 {
+		data.Page = 0
+	}
+	err := query.Offset(data.Page * data.Count).Limit(data.Count).Find(&searchData.Data).Error
+	searchData.MaxPages = count / int64(data.Count)
+	if searchData.MaxPages <= 0 {
+		searchData.MaxPages = 1
+	}
+	return *searchData, err
 }
 
 func GetAllProfileIDAndNames() ([]Profiles, error) {

@@ -42,18 +42,18 @@ func DeleteSubscriberFromProfile(subID uint64, profileID uint64) error {
 	return nil
 }
 
-func GetMySubscribersWithSearchParams(profileID uint64, searchData SearchDataForProfiles) ([]Profiles, error) {
-	subscribers := make([]Profiles, 0)
-	words := strings.Split(searchData.Stroke, " ")
+func GetMySubscribersWithSearchParams(profileID uint64, data SearchDataForProfiles) (GetSearchingDataFromProfiles, error) {
+	searchData := new(GetSearchingDataFromProfiles)
+	searchData.Data = make([]Profiles, 0)
+	words := strings.Split(data.Stroke, " ")
+	var count int64
 	query := DB.Model(new(Profiles)).
 		Joins("left join subscribs on subscribs.subscribers_id = profiles.id").
 		Where("subscribs.profiles_id = ?", profileID).
 		Preload("SubscribersList").
 		Preload("MySubscribesList").
-		Preload("Publications").
-		Where("profiles.id >= ?", searchData.FirstID)
-
-	for i := 0; searchData.Stroke != "" && i < len(words); i++ {
+		Preload("Publications")
+	for i := 0; data.Stroke != "" && i < len(words); i++ {
 		likeword := "%" + words[i] + "%"
 
 		if i == 0 {
@@ -66,22 +66,42 @@ func GetMySubscribersWithSearchParams(profileID uint64, searchData SearchDataFor
 			query.Or("profiles.id = ?", id)
 		}
 	}
-	err := query.Limit(searchData.Count).Find(&subscribers).Error
-	return subscribers, err
+	switch data.Sort {
+	case SortNameAsc:
+		query = query.Order("profiles.last_name ASC")
+	default:
+		query = query.Order("profiles.last_name DESC")
+	}
+
+	if query.Error != nil {
+		return *searchData, query.Error
+	}
+	query.Count(&count)
+	data.Page--
+	if data.Page < 0 {
+		data.Page = 0
+	}
+	err := query.Offset(data.Page * data.Count).Limit(data.Count).Find(&searchData.Data).Error
+	searchData.MaxPages = count / int64(data.Count)
+	if searchData.MaxPages <= 0 {
+		searchData.MaxPages = 1
+	}
+	return *searchData, err
+
 }
 
-func GetMySubscribesWithSearchParams(profileID uint64, searchData SearchDataForProfiles) ([]Profiles, error) {
-	subscribers := make([]Profiles, 0)
-	words := strings.Split(searchData.Stroke, " ")
+func GetMySubscribesWithSearchParams(profileID uint64, data SearchDataForProfiles) (GetSearchingDataFromProfiles, error) {
+	searchData := new(GetSearchingDataFromProfiles)
+	searchData.Data = make([]Profiles, 0)
+	words := strings.Split(data.Stroke, " ")
+	var count int64
 	query := DB.Model(new(Profiles)).
 		Joins("left join subscribs on subscribs.profiles_id = profiles.id").
 		Where("subscribs.subscribers_id = ?", profileID).
 		Preload("SubscribersList").
 		Preload("MySubscribesList").
-		Preload("Publications").
-		Where("profiles.id >= ?", searchData.FirstID)
-
-	for i := 0; searchData.Stroke != "" && i < len(words); i++ {
+		Preload("Publications")
+	for i := 0; data.Stroke != "" && i < len(words); i++ {
 		likeword := "%" + words[i] + "%"
 
 		if i == 0 {
@@ -94,6 +114,24 @@ func GetMySubscribesWithSearchParams(profileID uint64, searchData SearchDataForP
 			query.Or("profiles.id = ?", id)
 		}
 	}
-	err := query.Limit(searchData.Count).Find(&subscribers).Error
-	return subscribers, err
+	switch data.Sort {
+	case SortNameAsc:
+		query = query.Order("profiles.last_name ASC")
+	default:
+		query = query.Order("profiles.last_name DESC")
+	}
+	if query.Error != nil {
+		return *searchData, query.Error
+	}
+	query.Count(&count)
+	data.Page--
+	if data.Page < 0 {
+		data.Page = 0
+	}
+	err := query.Offset(data.Page * data.Count).Limit(data.Count).Find(&searchData.Data).Error
+	searchData.MaxPages = count / int64(data.Count)
+	if searchData.MaxPages <= 0 {
+		searchData.MaxPages = 1
+	}
+	return *searchData, err
 }

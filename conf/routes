@@ -5,73 +5,130 @@
 
 module:testrunner
 # module:jobs
-# Управление тегами
-GET     /tags/id/:id                            Tags.GetTagByID         # получение тега по ID
-GET     /tags/name/:name                        Tags.GetTagByName       # получение тега по названию
-GET     /tags                                   Tags.GetAllTags         # получение всех тегов
-POST    /tags                                   Tags.CreateTag          # создание нового тега
-POST    /tags/:id/publications                  Tags.AddPublicationsToTag # добавление публикаций к тегу
-DELETE  /tags/name/:name                        Tags.DeleteTagByName    # удаление тега по названию
-DELETE  /tags/:id/publications                  Tags.DeletePublicationsFromTag # удаление публикаций из тега
-PATCH   /tags/name/:name                        Tags.UpdateTagByName    # обновление тега по названию
 
-# Управление научными публикациями
-GET     /                                       Publications.ShowPublications # отображение списка публикаций (главная страница)
-GET     /getPublicationsData                    Publications.GetPublicationsData # получение данных всех публикаций
-GET     /create-publication                     Publications.ShowCreatePublicationPage # отображение страницы создания публикации
-GET     /update-publication                     Publications.ShowUpdatePublicationPage # отображение страницы редактирования публикации
-GET     /update-publication/:id                 Publications.GetPublicationData # получение данных публикации по ID для редактирования
-POST    /get-publications-paginator             Publications.GetPublicationsPaginator # получение публикаций с пагинацией
-POST    /get-file-with-publication-list         Publications.GetFileWithPublicationList # экспорт списка публикаций в файл
-POST    /create-publication                     Publications.CreatePublication # создание новой публикации
-DELETE  /delete-publication                     Publications.DeletePublication # удаление публикации
-DELETE  /publications/delete-author             Publications.DeleteAuthorFromPublication # удаление автора из публикации
-PATCH   /update-publication                     Publications.UpdatePublication # обновление данных публикации
+# ===== Управление тегами =====
+# получение тега по ID
+GET     /tags/id/:id                            Tags.GetTagByID
+# получение тега по названию
+GET     /tags/name/:name                        Tags.GetTagByName
+# получение всех тегов
+GET     /tags                                   Tags.GetAllTags
+# создание нового тега
+POST    /tags                                   Tags.CreateTag
+# добавление публикаций к тегу
+POST    /tags/:id/publications                  Tags.AddPublicationsToTag
+# удаление тега по названию
+DELETE  /tags/name/:name                        Tags.DeleteTagByName
+# удаление публикаций из тега
+DELETE  /tags/:id/publications                  Tags.DeletePublicationsFromTag
+# обновление тега по названию
+PATCH   /tags/name/:name                        Tags.UpdateTagByName
 
-# Аутентификация и управление профилями
-GET     /user-profile/:id                       Profiles.ShowUserProfilePageByID # отображение профиля пользователя по ID
-GET     /profiles/id/:id                        Profiles.GetProfileByID # получение данных профиля по ID
-GET     /getUserData                            Profiles.GetUserData   # получение данных текущего пользователя
-GET     /get-all-user-id-and-names              Profiles.GetUsersDataForCreatePublication # получение ID и имен всех пользователей (для создания публикации)
-GET     /profile                                Profiles.ShowUserProfile # отображение страницы профиля текущего пользователя
-GET     /login                                  Profiles.ShowLoginPage # отображение страницы авторизации
-GET     /logout                                 Profiles.Logout       # выход из системы и удаление сессии
-GET     /register                               Profiles.ShowRegisterPage # отображение страницы регистрации
-GET     /change-password                        Profiles.ShowChangePasswordPage # отображение страницы смены пароля
-POST    /login                                  Profiles.Login        # авторизация пользователя с помощью логина и пароля
-POST    /register                               Profiles.VerifyAndCreateUser # создание пользователя после верификации
-POST    /send-verification-code-for-register    Profiles.SendVerificationCodeForRegister # отправка кода подтверждения на email при регистрации
-POST    /send-verification-code-for-change-email Profiles.SendVerificationCodeForChangeEmail # отправка кода подтверждения для смены email
-POST    /send-verification-code-for-change-password Profiles.SendVerificationCodeForChangePassword # отправка кода подтверждения для смены пароля
-POST    /settings/verify-and-change-email       Profiles.VerifyAndChangeEmail # проверка кода и смена email
-POST    /settings/verify-and-change-password    Profiles.VerifyAndChangePassword # проверка кода и смена пароля
-POST    /settings/stop-change-email             Profiles.StopChangeEmail # отмена процесса смены email
-POST    /settings/stop-change-password          Profiles.StopChangePassword # отмена процесса смены пароля
-GET     /settings                               Profiles.ShowSettingsPage # отображение страницы настроек профиля
-POST    /subscribe/:id                          Profiles.AddSubscriberToProfile # подписка на профиль по ID
-DELETE  /profiles                               Profiles.DeleteProfileByID # удаление профиля текущего пользователя
-DELETE  /unsubscribe/:id                        Profiles.DeleteSubscriberFromProfile # отписка от профиля по ID
-PATCH   /profiles                               Profiles.UpdateProfileByID # обновление данных профиля пользователя
+# ===== Управление научными публикациями =====
+# отображение списка публикаций (главная страница)
+GET     /                                       Publications.ShowPublications
+# получение данных всех публикаций
+GET     /getPublicationsData                    Publications.GetPublicationsData
+# отображение страницы создания публикации
+GET     /create-publication                     Publications.ShowCreatePublicationPage
+# отображение страницы редактирования публикации
+GET     /update-publication                     Publications.ShowUpdatePublicationPage
+# получение данных публикации по ID для редактирования
+GET     /update-publication/:id                 Publications.GetPublicationData
+# получение публикаций с пагинацией
+POST    /get-publications-paginator             Publications.GetPublicationsPaginator
+# экспорт списка публикаций в файл
+POST    /get-file-with-publication-list         Publications.GetFileWithPublicationList
+# создание новой публикации
+POST    /create-publication                     Publications.CreatePublication
+# удаление публикации
+DELETE  /delete-publication                     Publications.DeletePublication
+# удаление автора из публикации
+DELETE  /publications/delete-author             Publications.DeleteAuthorFromPublication
+# обновление данных публикации
+PATCH   /update-publication                     Publications.UpdatePublication
 
-# Социальные элементы и взаимодействие пользователей
-GET     /authors                                Profiles.ShowAuthorsPage # отображение страницы со списком авторов
-GET     /subscribers                            Profiles.ShowMySubscribers # отображение страницы с подписчиками текущего пользователя
-GET     /subscribes                             Profiles.ShowMySubscribes # отображение страницы с подписками текущего пользователя
-POST    /get-authors-paginator                  Profiles.GetAuthorsPaginator # получение списка авторов с пагинацией
-POST    /get-subscribers-paginator              Profiles.GetMySubscribersPaginator # получение списка подписчиков с пагинацией
-POST    /get-subscribes-paginator               Profiles.GetMySubscribesPaginator # получение списка подписок с пагинацией
+# ===== Аутентификация и управление профилями =====
+# отображение профиля пользователя по ID
+GET     /user-profile/:id                       Profiles.ShowUserProfilePageByID
+# получение данных профиля по ID
+GET     /profiles/id/:id                        Profiles.GetProfileByID
+# получение данных текущего пользователя
+GET     /getUserData                            Profiles.GetUserData
+# получение ID и имен всех пользователей (для создания публикации)
+GET     /get-all-user-id-and-names              Profiles.GetUsersDataForCreatePublication
+# отображение страницы профиля текущего пользователя
+GET     /profile                                Profiles.ShowUserProfile
+# отображение страницы авторизации
+GET     /login                                  Profiles.ShowLoginPage
+# выход из системы и удаление сессии
+GET     /logout                                 Profiles.Logout
+# отображение страницы регистрации
+GET     /register                               Profiles.ShowRegisterPage
+# отображение страницы смены пароля
+GET     /change-password                        Profiles.ShowChangePasswordPage
+# авторизация пользователя с помощью логина и пароля
+POST    /login                                  Profiles.Login
+# создание пользователя после верификации
+POST    /register                               Profiles.VerifyAndCreateUser
+# отправка кода подтверждения на email при регистрации
+POST    /send-verification-code-for-register    Profiles.SendVerificationCodeForRegister
+# отправка кода подтверждения для смены email
+POST    /send-verification-code-for-change-email Profiles.SendVerificationCodeForChangeEmail
+# отправка кода подтверждения для смены пароля
+POST    /send-verification-code-for-change-password Profiles.SendVerificationCodeForChangePassword
+# проверка кода и смена email
+POST    /settings/verify-and-change-email       Profiles.VerifyAndChangeEmail
+# проверка кода и смена пароля
+POST    /settings/verify-and-change-password    Profiles.VerifyAndChangePassword
+# отмена процесса смены email
+POST    /settings/stop-change-email             Profiles.StopChangeEmail
+# отмена процесса смены пароля
+POST    /settings/stop-change-password          Profiles.StopChangePassword
+# отображение страницы настроек профиля
+GET     /settings                               Profiles.ShowSettingsPage
+# подписка на профиль по ID
+POST    /subscribe/:id                          Profiles.AddSubscriberToProfile
+# удаление профиля текущего пользователя
+DELETE  /profiles                               Profiles.DeleteProfileByID
+# отписка от профиля по ID
+DELETE  /unsubscribe/:id                        Profiles.DeleteSubscriberFromProfile
+# обновление данных профиля пользователя
+PATCH   /profiles                               Profiles.UpdateProfileByID
 
-# Административные функции
-GET     /admin                                  Admins.ShowAdminPage   # отображение административной панели
-GET     /login-admin                            Admins.ShowLoginAdminPage # отображение страницы входа для администраторов
-POST    /login-admin                            Admins.LoginAdmin     # авторизация администратора
-GET     /logout-admin                           Admins.LogoutAdmin    # выход из административной панели
+# ===== Социальные элементы и взаимодействие пользователей =====
+# отображение страницы со списком авторов
+GET     /authors                                Profiles.ShowAuthorsPage
+# отображение страницы с подписчиками текущего пользователя
+GET     /subscribers                            Profiles.ShowMySubscribers
+# отображение страницы с подписками текущего пользователя
+GET     /subscribes                             Profiles.ShowMySubscribes
+# получение списка авторов с пагинацией
+POST    /get-authors-paginator                  Profiles.GetAuthorsPaginator
+# получение списка подписчиков с пагинацией
+POST    /get-subscribers-paginator              Profiles.GetMySubscribersPaginator
+# получение списка подписок с пагинацией
+POST    /get-subscribes-paginator               Profiles.GetMySubscribesPaginator
 
-# Интеграция с внешними авторизационными сервисами
-GET     /callback-ya                            OpenID.ShowCallbackYAPage # обработка callback при авторизации через Яндекс
-POST    /token-ya                               OpenID.GetCodeForYAToken # обработка токена аутентификации Яндекса
-POST    /token-vk                               OpenID.GetCodeForVKToken # обработка токена аутентификации ВКонтакте
+# ===== Административные функции =====
+# отображение административной панели
+GET     /admin                                  Admins.ShowAdminPage
+# отображение страницы входа для администраторов
+GET     /login-admin                            Admins.ShowLoginAdminPage
+# авторизация администратора
+POST    /login-admin                            Admins.LoginAdmin
+# выход из административной панели
+GET     /logout-admin                           Admins.LogoutAdmin
 
+# ===== Интеграция с внешними авторизационными сервисами =====
+# обработка callback при авторизации через Яндекс
+GET     /callback-ya                            OpenID.ShowCallbackYAPage
+# обработка токена аутентификации Яндекса
+POST    /token-ya                               OpenID.GetCodeForYAToken
+# обработка токена аутентификации ВКонтакте
+POST    /token-vk                               OpenID.GetCodeForVKToken
+
+# ===== Системные маршруты =====
 # Ignore favicon requests
 GET     /favicon.ico                            404
 

@@ -426,10 +426,16 @@
     <div class="search-bar">
         <input type="text" id="searchInput" placeholder="Поиск публикаций...">
         <select id="sortSelect">
-            <option value="created_at_desc">По дате (новые)</option>
-            <option value="created_at_asc">По дате (старые)</option>
-            <option value="title_asc">По названию (А-Я)</option>
-            <option value="title_desc">По названию (Я-А)</option>
+            <option value="1" selected>По дате (новые)</option>
+            <option value="0">По дате (старые)</option>
+            <option value="2">По названию (А-Я)</option>
+            <option value="3">По названию (Я-А)</option>
+        </select>
+        <select id="countSelect">
+            <option value="5">5 на странице</option>
+            <option value="10" selected>10 на странице</option>
+            <option value="15">15 на странице</option>
+            <option value="20">20 на странице</option>
         </select>
         <button class="filter-button" onclick="openFilterModal()">Фильтры</button>
         <button class="reset-all-button" onclick="resetAll()">Сбросить всё</button>
@@ -473,7 +479,7 @@
         tags: [],
         page: 1,
         count: 10,
-        sort: "created_at_desc"
+        sort: 1  // SortDateDesc - по умолчанию новые публикации первыми
     };
     let maxPages = 1;
 
@@ -501,7 +507,13 @@
         });
 
         document.getElementById('sortSelect').addEventListener('change', function(e) {
-            searchData.sort = e.target.value;
+            searchData.sort = parseInt(e.target.value);
+            searchData.page = 1;
+            loadPublications();
+        });
+
+        document.getElementById('countSelect').addEventListener('change', function(e) {
+            searchData.count = parseInt(e.target.value);
             searchData.page = 1;
             loadPublications();
         });
@@ -683,9 +695,11 @@
         searchData.title = '';
         searchData.tags = [];
         searchData.page = 1;
-        searchData.sort = 'created_at_desc';
+        searchData.sort = 1;  // SortDateDesc
+        searchData.count = 10;
         document.getElementById('searchInput').value = '';
-        document.getElementById('sortSelect').value = 'created_at_desc';
+        document.getElementById('sortSelect').value = '1';
+        document.getElementById('countSelect').value = '10';
         loadPublications();
     }
 

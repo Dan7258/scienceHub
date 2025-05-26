@@ -366,14 +366,15 @@ func (p Profiles) GetUsersDataForCreatePublication() revel.Result {
 	return p.RenderJSON(profile)
 }
 
-func (p Profiles) DeleteProfileByID() revel.Result {
+func (p Profiles) DeleteProfileByID(id uint64) revel.Result {
 	userID, err := middleware.ValidateJWT(p.Request, "auth_token")
-	if err != nil {
+	_, err2 := middleware.ValidateAdminJWT(p.Request, "auth_token_admin")
+	if (err != nil || userID != id) && err2 != nil {
 		p.Response.Status = http.StatusUnauthorized
 		return p.Redirect("/login")
 	}
-	sUserID := fmt.Sprintf("%d", userID)
-	err = models.DeleteProfileByID(userID)
+	sUserID := fmt.Sprintf("%d", id)
+	err = models.DeleteProfileByID(id)
 	if err != nil {
 		p.Response.Status = http.StatusInternalServerError
 		return p.RenderJSON(map[string]string{"error": err.Error()})

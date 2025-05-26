@@ -546,7 +546,7 @@
                             }
 
                             // Отправляем запрос на удаление с ID пользователя
-                            return fetch(`/profiles`, {
+                            return fetch(`/profiles/${userData.id}`, {
                                 method: 'DELETE',
                                 credentials: 'include'
                             });

@@ -90,7 +90,7 @@ GET     /settings                               Profiles.ShowSettingsPage
 # подписка на профиль по ID
 POST    /subscribe/:id                          Profiles.AddSubscriberToProfile
 # удаление профиля текущего пользователя
-DELETE  /profiles                               Profiles.DeleteProfileByID
+DELETE  /profiles/:id                           Profiles.DeleteProfileByID
 # отписка от профиля по ID
 DELETE  /unsubscribe/:id                        Profiles.DeleteSubscriberFromProfile
 # обновление данных профиля пользователя

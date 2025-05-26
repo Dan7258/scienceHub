@@ -75,6 +75,23 @@
             </button>
         </form>
     </section>
+
+    <!-- Form: Delete User -->
+    <section class="bg-white p-6 rounded-lg shadow-md mt-8">
+        <h2 class="text-xl font-semibold mb-4">Удалить пользователя</h2>
+        <form id="deleteUserForm" class="space-y-6">
+            <div>
+                <label for="userId" class="block text-base font-semibold text-gray-800">ID пользователя</label>
+                <input type="text" id="userId" name="id" required
+                       class="mt-1 block w-full border-2 border-gray-400 rounded-md shadow-sm bg-gray-50 text-base py-2 px-3 focus:ring-2 focus:ring-red-600 focus:border-red-600 hover:border-gray-500"
+                       placeholder="Введите ID пользователя для удаления">
+            </div>
+            <button type="submit"
+                    class="bg-red-600 hover:bg-red-700 text-white font-semibold py-2 px-4 rounded">
+                Удалить пользователя
+            </button>
+        </form>
+    </section>
 </main>
 
 <!-- JavaScript for Form Submission -->
@@ -161,6 +178,35 @@
             }
         } catch (error) {
             alert('Network error: ' + error.message);
+        }
+    });
+
+    // Delete User Form Submission
+    document.getElementById('deleteUserForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const formData = new FormData(e.target);
+        const userId = formData.get('id');
+
+        const confirmed = confirm(`Вы уверены, что хотите удалить пользователя с ID ${userId}? Это действие необратимо.`);
+        if (!confirmed) return;
+
+        try {
+            const response = await fetch(`/profiles/${encodeURIComponent(userId)}`, {
+                method: 'DELETE',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            });
+
+            if (response.ok) {
+                alert('Пользователь успешно удалён!');
+                e.target.reset();
+            } else {
+                const error = await response.json();
+                alert('Ошибка при удалении пользователя: ' + (error.message || 'Неизвестная ошибка'));
+            }
+        } catch (error) {
+            alert('Сетевая ошибка: ' + error.message);
         }
     });
 </script>

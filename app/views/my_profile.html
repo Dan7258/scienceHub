@@ -198,10 +198,40 @@
             font-weight: normal;
             cursor: pointer;
             transition: background-color 0.2s ease;
+            position: relative;
+            display: flex;
+            align-items: center;
+            gap: 8px;
         }
 
-        .filters button:hover {
+        .filters button:hover:not(:disabled) {
             background: var(--accent-hover);
+        }
+
+        .filters button:disabled {
+            background: #9ca3af;
+            cursor: not-allowed;
+        }
+
+        /* Стили для индикатора загрузки */
+        .loading-spinner {
+            width: 16px;
+            height: 16px;
+            border: 2px solid transparent;
+            border-top: 2px solid currentColor;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .button-content {
+            display: flex;
+            align-items: center;
+            gap: 8px;
         }
 
         .publication {
@@ -491,7 +521,12 @@
                     </select>
                 </div>
             </div>
-            <button onclick="downloadFilteredPublications()">📥 Скачать список публикаций</button>
+            <button id="downloadButton" onclick="downloadFilteredPublications()">
+                <span class="button-content">
+                    <span id="downloadIcon">📥</span>
+                    <span id="downloadText">Скачать список публикаций</span>
+                </span>
+            </button>
         </div>
 
         <h2>Публикации</h2>
@@ -859,6 +894,22 @@
             });
     }
 
+    function setDownloadButtonLoading(isLoading) {
+        const button = document.getElementById('downloadButton');
+        const icon = document.getElementById('downloadIcon');
+        const text = document.getElementById('downloadText');
+
+        if (isLoading) {
+            button.disabled = true;
+            icon.innerHTML = '<div class="loading-spinner"></div>';
+            text.textContent = 'Создание файла...';
+        } else {
+            button.disabled = false;
+            icon.textContent = '📥';
+            text.textContent = 'Скачать список публикаций';
+        }
+    }
+
     function downloadFilteredPublications() {
         const count = parseInt(document.getElementById('count_publications').value);
         const dateStart = document.getElementById('date_start').value;
@@ -871,6 +922,9 @@
             DateEnd: dateEnd ? new Date(dateEnd).toISOString() : null,
             Type: type
         };
+
+        // Показываем индикатор загрузки
+        setDownloadButtonLoading(true);
 
         fetch('/get-file-with-publication-list', {
             method: 'POST',
@@ -895,6 +949,10 @@
             .catch(error => {
                 console.error('Ошибка при скачивании:', error);
                 alert("Не удалось получить файл публикаций.");
+            })
+            .finally(() => {
+                // Скрываем индикатор загрузки в любом случае
+                setDownloadButtonLoading(false);
             });
     }
 </script>

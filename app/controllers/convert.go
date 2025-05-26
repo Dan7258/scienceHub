@@ -47,16 +47,16 @@ func createWordDocument(userID uint64, publications []models.Publications) (stri
 	borders.SetAll(wml.ST_BorderSingle, color.Auto, 1*measurement.Point)
 
 	row := table.AddRow()
-	AddRow(&row, "№")
-	AddRow(&row, "Наименование работы")
-	AddRow(&row, "Дата публикации")
-	AddRow(&row, "Авторы")
+	AddRow(&row, "№", true)
+	AddRow(&row, "Наименование работы", true)
+	AddRow(&row, "Дата публикации", true)
+	AddRow(&row, "Авторы", true)
 	for index, publication := range publications {
 		row = table.AddRow()
-		AddRow(&row, fmt.Sprint(index+1))
-		AddRow(&row, publication.Title)
-		AddRow(&row, fmt.Sprint(publication.CreatedAt.Format("02.01.2006")))
-		AddRow(&row, getAuthorsFromPublication(publication))
+		AddRow(&row, fmt.Sprint(index+1), false)
+		AddRow(&row, publication.Title, false)
+		AddRow(&row, fmt.Sprint(publication.CreatedAt.Format("02.01.2006")), false)
+		AddRow(&row, getAuthorsFromPublication(publication), false)
 	}
 	randomNum, _ := GenerateRandomNumber()
 	filename := fmt.Sprintf("public/uploads/%d_%d_list.docx", userID, randomNum)
@@ -174,10 +174,13 @@ func SetCellParams(cell spreadsheet.Cell, style spreadsheet.CellStyle, text stri
 	cell.SetStyle(style)
 }
 
-func AddRow(row *document.Row, text string) {
+func AddRow(row *document.Row, text string, bold bool) {
 	run := row.AddCell().AddParagraph().AddRun()
 	run.Properties().SetFontFamily("Times New Roman")
 	run.Properties().SetSize(14)
+	if bold {
+		run.Properties().SetBold(true)
+	}
 	run.AddText(text)
 }
 

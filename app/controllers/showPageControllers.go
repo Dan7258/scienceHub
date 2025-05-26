@@ -72,7 +72,8 @@ func (p Publications) ShowCreatePublicationPage() revel.Result {
 
 func (p Publications) ShowUpdatePublicationPage() revel.Result {
 	_, err := middleware.ValidateJWT(p.Request, "auth_token")
-	if err != nil {
+	_, err2 := middleware.ValidateAdminJWT(p.Request, "auth_token_admin")
+	if err != nil && err2 != nil {
 		return p.Redirect("/login")
 	}
 	return p.RenderTemplate("update_publication.html")

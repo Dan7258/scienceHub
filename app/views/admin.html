@@ -92,6 +92,23 @@
             </button>
         </form>
     </section>
+
+    <!-- Form: Edit Publication -->
+    <section class="bg-white p-6 rounded-lg shadow-md mt-8">
+        <h2 class="text-xl font-semibold mb-4">Редактировать публикацию</h2>
+        <form id="editPublicationForm" class="space-y-6">
+            <div>
+                <label for="publicationId" class="block text-base font-semibold text-gray-800">ID публикации</label>
+                <input type="number" id="publicationId" name="id" required
+                       class="mt-1 block w-full border-2 border-gray-400 rounded-md shadow-sm bg-gray-50 text-base py-2 px-3 focus:ring-2 focus:ring-yellow-600 focus:border-yellow-600 hover:border-gray-500"
+                       placeholder="Введите ID публикации для редактирования">
+            </div>
+            <button type="submit"
+                    class="bg-yellow-500 hover:bg-yellow-600 text-white font-semibold py-2 px-4 rounded">
+                Перейти к редактированию
+            </button>
+        </form>
+    </section>
 </main>
 
 <!-- JavaScript for Form Submission -->
@@ -208,6 +225,20 @@
         } catch (error) {
             alert('Сетевая ошибка: ' + error.message);
         }
+    });
+
+    // Edit Publication Form Submission
+    document.getElementById('editPublicationForm').addEventListener('submit', (e) => {
+        e.preventDefault();
+        const formData = new FormData(e.target);
+        const publicationId = formData.get('id');
+
+        if (!publicationId) {
+            alert('Введите корректный ID публикации');
+            return;
+        }
+
+        window.location.href = `/update-publication?id=${encodeURIComponent(publicationId)}`;
     });
 </script>
 </body>

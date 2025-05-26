@@ -134,7 +134,9 @@ func (p Publications) DeleteAuthorFromPublication() revel.Result {
 
 func (p Publications) GetPublicationData(id uint64) revel.Result {
 	_, err := middleware.ValidateJWT(p.Request, "auth_token")
-	if err != nil {
+	_, err2 := middleware.ValidateAdminJWT(p.Request, "auth_token_admin")
+	if err != nil && err2 != nil {
+		p.Response.Status = http.StatusUnauthorized
 		return p.Redirect("/login")
 	}
 	pub, err := models.GetPublicationByID(id)
@@ -147,24 +149,21 @@ func (p Publications) GetPublicationData(id uint64) revel.Result {
 }
 
 func (p Publications) DeletePublication() revel.Result {
-	userID, err := middleware.ValidateJWT(p.Request, "auth_token")
-	if err != nil {
-		//p.Response.Status = http.StatusUnauthorized
+	_, err := middleware.ValidateJWT(p.Request, "auth_token")
+	_, err2 := middleware.ValidateAdminJWT(p.Request, "auth_token_admin")
+	if err != nil && err2 != nil {
+		p.Response.Status = http.StatusUnauthorized
 		return p.Redirect("/login")
 	}
-	sUserID := fmt.Sprintf("%d", userID)
-	_ = models.DeleteDataFromRedis(sUserID)
+
 	pub := new(models.Publications)
 	err = p.Params.BindJSON(pub)
 	if err != nil {
 		p.Response.Status = http.StatusBadRequest
 		return p.RenderJSON(map[string]string{"error": err.Error()})
 	}
-
-	if pub.OwnerID != userID {
-		p.Response.Status = http.StatusForbidden
-		return p.RenderJSON(map[string]string{"error": "Вы не можете редактировать чужие публикации!"})
-	}
+	sUserID := fmt.Sprintf("%d", pub.OwnerID)
+	_ = models.DeleteDataFromRedis(sUserID)
 
 	err = models.DeletePublicationByID(pub.ID)
 	if err != nil {
@@ -181,12 +180,12 @@ func (p Publications) DeletePublication() revel.Result {
 
 func (p Publications) UpdatePublication() revel.Result {
 	userID, err := middleware.ValidateJWT(p.Request, "auth_token")
-	if err != nil {
-		//p.Response.Status = http.StatusUnauthorized
+	_, err2 := middleware.ValidateAdminJWT(p.Request, "auth_token_admin")
+	if err != nil && err2 != nil {
+		p.Response.Status = http.StatusUnauthorized
 		return p.Redirect("/login")
 	}
-	sUserID := fmt.Sprintf("%d", userID)
-	_ = models.DeleteDataFromRedis(sUserID)
+
 	pub := new(models.Publications)
 	pubID := p.Params.Get("publication_id")
 	pub.ID, err = strconv.ParseUint(pubID, 10, 64)
@@ -195,7 +194,8 @@ func (p Publications) UpdatePublication() revel.Result {
 	ownerIDStr := p.Params.Get("owner_id")
 	pub.OwnerID, err = strconv.ParseUint(ownerIDStr, 10, 64)
 	pub.FileLink = p.Params.Get("fileLink")
-
+	sUserID := ownerIDStr
+	_ = models.DeleteDataFromRedis(sUserID)
 	validate := validator.New()
 	err = validate.Struct(pub)
 	if err != nil {
@@ -203,7 +203,7 @@ func (p Publications) UpdatePublication() revel.Result {
 		return p.RenderJSON(map[string]string{"error": err.Error()})
 	}
 
-	if pub.OwnerID != userID {
+	if pub.OwnerID != userID && err2 != nil {
 		p.Response.Status = http.StatusForbidden
 		return p.RenderJSON(map[string]string{"error": "Вы не можете редактировать чужие публикации!"})
 	}
@@ -217,7 +217,7 @@ func (p Publications) UpdatePublication() revel.Result {
 		}
 		defer file.Close()
 		randomNumber, _ := GenerateRandomNumber()
-		filePath := fmt.Sprintf("public/uploads/%d_%s_%s", userID, randomNumber, fileHeader[0].Filename)
+		filePath := fmt.Sprintf("public/uploads/%s_%s_%s", sUserID, randomNumber, fileHeader[0].Filename)
 		dst, err := os.Create(filePath)
 		if err != nil {
 			p.Response.Status = http.StatusInternalServerError
@@ -256,8 +256,8 @@ func (p Publications) UpdatePublication() revel.Result {
 	rawCoauthors := p.Params.Values["coauthors[]"]
 	unique = make(map[uint64]interface{}, 0)
 	coauthorIDs := make([]uint64, 0)
-	coauthorIDs = append(coauthorIDs, userID)
-	unique[userID] = nil
+	coauthorIDs = append(coauthorIDs, pub.OwnerID)
+	unique[pub.OwnerID] = nil
 	for _, ID := range rawCoauthors {
 		coauthorID, _ := strconv.ParseUint(ID, 10, 64)
 		_, ok := unique[coauthorID]

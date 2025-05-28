@@ -53,6 +53,7 @@ require (
 	github.com/richardlehane/msoleps v1.0.4 // indirect
 	github.com/rs/xid v1.5.0 // indirect
 	github.com/sirupsen/logrus v1.9.3 // indirect
+	github.com/striker2000/petrovich v1.0.6 // indirect
 	github.com/xeonx/timeago v1.0.0-rc4 // indirect
 	golang.org/x/net v0.34.0 // indirect
 	golang.org/x/sync v0.11.0 // indirect

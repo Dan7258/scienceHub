@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"fmt"
+	"github.com/striker2000/petrovich"
 	"github.com/unidoc/unioffice/color"
 	"github.com/unidoc/unioffice/common/license"
 	"github.com/unidoc/unioffice/document"
@@ -40,6 +41,11 @@ func createWordDocument(userID uint64, publications []models.Publications) (stri
 	doc := document.New()
 	defer doc.Close()
 
+	addStrokeCenter(doc, 16, "СПИСОК")
+	addStrokeCenter(doc, 12, "учебно-методических и научных работ")
+	addStrokeCenter(doc, 12, getFormattedNameByID(userID))
+
+	doc.AddParagraph()
 	table := doc.AddTable()
 	table.Properties().SetWidthPercent(100)
 
@@ -49,14 +55,16 @@ func createWordDocument(userID uint64, publications []models.Publications) (stri
 	row := table.AddRow()
 	AddRow(&row, "№", true)
 	AddRow(&row, "Наименование работы", true)
+	AddRow(&row, "Форма работы", true)
 	AddRow(&row, "Дата публикации", true)
-	AddRow(&row, "Авторы", true)
+	AddRow(&row, "Соавторы", true)
 	for index, publication := range publications {
 		row = table.AddRow()
 		AddRow(&row, fmt.Sprint(index+1), false)
 		AddRow(&row, publication.Title, false)
+		AddRow(&row, "Печатные", false)
 		AddRow(&row, fmt.Sprint(publication.CreatedAt.Format("02.01.2006")), false)
-		AddRow(&row, getAuthorsFromPublication(publication), false)
+		AddRow(&row, getAuthorsFromPublication(userID, publication), false)
 	}
 	randomNum, _ := GenerateRandomNumber()
 	filename := fmt.Sprintf("public/uploads/%d_%d_list.docx", userID, randomNum)
@@ -67,9 +75,33 @@ func createWordDocument(userID uint64, publications []models.Publications) (stri
 	return filename, nil
 }
 
-func getAuthorsFromPublication(publication models.Publications) string {
+func getFormattedNameByID(ID uint64) string {
+	profile, _ := models.GetProfileNameByID(ID)
+	fname := petrovich.FirstName(profile.FirstName, petrovich.Male, petrovich.Genitive)
+	lname := petrovich.LastName(profile.LastName, petrovich.Male, petrovich.Genitive)
+	mname := " " + petrovich.MiddleName(profile.MiddleName, petrovich.Male, petrovich.Genitive)
+	if mname == " " {
+		mname = ""
+	}
+
+	return fmt.Sprintf("%s %s%s", lname, fname, mname)
+}
+
+func addStrokeCenter(doc *document.Document, fontSize float64, stroke string) {
+	p := doc.AddParagraph()
+	run := p.AddRun()
+	run.Properties().SetSize(measurement.Distance(fontSize))
+	run.Properties().SetFontFamily("Times New Roman")
+	run.AddText(stroke)
+	p.Properties().SetAlignment(wml.ST_JcCenter)
+}
+
+func getAuthorsFromPublication(userID uint64, publication models.Publications) string {
 	authors := make([]string, 0)
 	for _, profile := range publication.Profiles {
+		if profile.ID == userID {
+			continue
+		}
 		if profile.MiddleName == "" {
 			authors = append(authors, fmt.Sprintf("%s %s", profile.LastName, profile.FirstName))
 		} else {
@@ -100,8 +132,9 @@ func createExcelDocument(userID uint64, publications []models.Publications) (str
 	headers := []string{
 		"№",
 		"Наименование работы",
+		"Форма работы",
 		"Дата публикации",
-		"Авторы",
+		"Соавторы",
 	}
 	row := sheet.AddRow()
 
@@ -119,8 +152,9 @@ func createExcelDocument(userID uint64, publications []models.Publications) (str
 		row = sheet.AddRow()
 		SetCellParams(row.AddCell(), style, fmt.Sprint(i+1))
 		SetCellParams(row.AddCell(), style, publication.Title)
+		SetCellParams(row.AddCell(), style, "Печатные")
 		SetCellParams(row.AddCell(), style, fmt.Sprint(publication.CreatedAt.Format("02.01.2006")))
-		SetCellParams(row.AddCell(), style, getAuthorsFromPublication(publication))
+		SetCellParams(row.AddCell(), style, getAuthorsFromPublication(userID, publication))
 		row.SetHeightAuto()
 	}
 	err := exel.Validate()

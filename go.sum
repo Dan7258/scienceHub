@@ -148,6 +148,8 @@ github.com/stretchr/testify v1.3.0/go.mod h1:M5WIy9Dh21IEIfnGCwXGc5bZfKNJtfHm1UV
 github.com/stretchr/testify v1.7.0/go.mod h1:6Fq8oRcR53rry900zMqJjRRixrwX3KX962/h/Wwjteg=
 github.com/stretchr/testify v1.9.0 h1:HtqpIVDClZ4nwg75+f6Lvsy/wHu+3BoSGCbBAcpTsTg=
 github.com/stretchr/testify v1.9.0/go.mod h1:r2ic/lqez/lEtzL7wO/rwa5dbSLXVDPFyf8C91i36aY=
+github.com/striker2000/petrovich v1.0.6 h1:65nRtDsbEwtc5hwSf677Un4UbYyqo5osrnLkocBf9uI=
+github.com/striker2000/petrovich v1.0.6/go.mod h1:tFtM0tTaSrKIX5uokAZRcopFZFcaeKRN9zj3EJgztJI=
 github.com/twinj/uuid v1.0.0/go.mod h1:mMgcE1RHFUFqe5AfiwlINXisXfDGro23fWdPUfOMjRY=
 github.com/tylerb/gls v0.0.0-20150407001822-e606233f194d/go.mod h1:0MwyId/pXK5wkYYEXe7NnVknX+aNBuF73fLV3U0reU8=
 github.com/tylerb/is v2.1.4+incompatible/go.mod h1:3Bw2NWEEe8Kx7/etYqgm9ug53iNDgabnloch75jjOSc=

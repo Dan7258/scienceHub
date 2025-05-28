@@ -177,6 +177,15 @@ func GetAllProfileIDAndNames() ([]Profiles, error) {
 	return profiles, nil
 }
 
+func GetProfileNameByID(id uint64) (Profiles, error) {
+	var profile Profiles
+	result := DB.Select("id, first_name, last_name, middle_name").First(&profile, id)
+	if result.Error != nil {
+		return profile, result.Error
+	}
+	return profile, nil
+}
+
 func DeleteProfileByID(ID uint64) error {
 	profile := new(Profiles)
 	err := DB.Model(new(Subscribs)).Where("profiles_id = ? OR subscribers_id = ?", ID, ID).Delete(new(Subscribs)).Error

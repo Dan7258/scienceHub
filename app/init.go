@@ -1,9 +1,8 @@
 package app
 
 import (
-	"github.com/revel/revel"
 	_ "github.com/revel/modules"
-
+	"github.com/revel/revel"
 )
 
 var (
@@ -17,6 +16,7 @@ var (
 func init() {
 	// Filters is the default set of global filters.
 	revel.Filters = []revel.Filter{
+		CorsFilter,
 		revel.PanicFilter,             // Recover from panics and display an error page instead.
 		revel.RouterFilter,            // Use the routing table to select the right Action
 		revel.FilterConfiguringFilter, // A hook for adding or removing per-Action filters.
@@ -50,6 +50,23 @@ var HeaderFilter = func(c *revel.Controller, fc []revel.Filter) {
 	c.Response.Out.Header().Add("Referrer-Policy", "strict-origin-when-cross-origin")
 
 	fc[0](c, fc[1:]) // Execute the next filter stage.
+}
+
+var CorsFilter = func(c *revel.Controller, fc []revel.Filter) {
+	c.Response.Out.Header().Set("Access-Control-Allow-Origin", "http://localhost:5173")
+	c.Response.Out.Header().Set("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS, PATCH")
+	c.Response.Out.Header().Set("Access-Control-Allow-Headers", "Content-Type, Authorization, X-Requested-With")
+	c.Response.Out.Header().Set("Access-Control-Allow-Credentials", "true")
+	c.Response.Out.Header().Set("Access-Control-Max-Age", "3600")
+
+	// Если это preflight OPTIONS запрос, отвечаем сразу
+	if c.Request.Method == "OPTIONS" {
+		c.Response.Status = 200
+		return
+	}
+
+	// Вызываем следующий фильтр
+	fc[0](c, fc[1:])
 }
 
 //func ExampleStartupScript() {

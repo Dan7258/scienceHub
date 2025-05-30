@@ -181,7 +181,7 @@ func GetAllProfileIDAndNames() ([]Profiles, error) {
 
 func GetProfileNameByID(id uint64) (Profiles, error) {
 	var profile Profiles
-	result := DB.Select("id, first_name, last_name, middle_name").First(&profile, id)
+	result := DB.Select("id, first_name, last_name, middle_name, gender").First(&profile, id)
 	if result.Error != nil {
 		return profile, result.Error
 	}

@@ -77,9 +77,18 @@ func createWordDocument(userID uint64, publications []models.Publications) (stri
 
 func getFormattedNameByID(ID uint64) string {
 	profile, _ := models.GetProfileNameByID(ID)
-	fname := petrovich.FirstName(profile.FirstName, petrovich.Male, petrovich.Genitive)
-	lname := petrovich.LastName(profile.LastName, petrovich.Male, petrovich.Genitive)
-	mname := " " + petrovich.MiddleName(profile.MiddleName, petrovich.Male, petrovich.Genitive)
+	var gender petrovich.Gender
+	switch profile.Gender {
+	case 0:
+		gender = petrovich.Female
+	case 1:
+		gender = petrovich.Male
+	default:
+		gender = petrovich.Androgynous
+	}
+	fname := petrovich.FirstName(profile.FirstName, gender, petrovich.Genitive)
+	lname := petrovich.LastName(profile.LastName, gender, petrovich.Genitive)
+	mname := " " + petrovich.MiddleName(profile.MiddleName, gender, petrovich.Genitive)
 	if mname == " " {
 		mname = ""
 	}

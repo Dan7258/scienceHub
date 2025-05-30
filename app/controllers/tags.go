@@ -15,8 +15,7 @@ type Tags struct {
 func (t Tags) CreateTag() revel.Result {
 	_, err := middleware.ValidateAdminJWT(t.Request, "auth_token_admin")
 	if err != nil {
-		//p.Response.Status = http.StatusUnauthorized
-		return t.Redirect("/login-admin")
+		return t.RenderJSON(map[string]int{"status": http.StatusUnauthorized})
 	}
 	tag := new(models.Tags)
 	err = t.Params.BindJSON(&tag)
@@ -67,8 +66,7 @@ func (t Tags) GetTagByName(name string) revel.Result {
 func (t Tags) DeleteTagByName(name string) revel.Result {
 	_, err := middleware.ValidateAdminJWT(t.Request, "auth_token_admin")
 	if err != nil {
-		//p.Response.Status = http.StatusUnauthorized
-		return t.Redirect("/login-admin")
+		return t.RenderJSON(map[string]int{"status": http.StatusUnauthorized})
 	}
 	err = models.DeleteTagByName(name)
 	if err != nil {
@@ -82,8 +80,7 @@ func (t Tags) DeleteTagByName(name string) revel.Result {
 func (t Tags) UpdateTagByName(name string) revel.Result {
 	_, err := middleware.ValidateAdminJWT(t.Request, "auth_token_admin")
 	if err != nil {
-		//p.Response.Status = http.StatusUnauthorized
-		return t.Redirect("/login-admin")
+		return t.RenderJSON(map[string]int{"status": http.StatusUnauthorized})
 	}
 	tag := new(models.Tags)
 	err = t.Params.BindJSON(&tag)

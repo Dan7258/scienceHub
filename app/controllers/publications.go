@@ -27,8 +27,7 @@ type DeleteAuthorFromPublication struct {
 func (p Publications) CreatePublication() revel.Result {
 	userID, err := middleware.ValidateJWT(p.Request, "auth_token")
 	if err != nil {
-		//p.Response.Status = http.StatusUnauthorized
-		return p.Redirect("/login")
+		return p.RenderJSON(map[string]int{"status": http.StatusUnauthorized})
 	}
 	sUserID := fmt.Sprintf("%d", userID)
 	_ = models.DeleteDataFromRedis(sUserID)
@@ -114,13 +113,13 @@ func (p Publications) CreatePublication() revel.Result {
 		return p.RenderJSON(map[string]string{"error": err.Error()})
 	}
 
-	return p.Redirect("/profile")
+	return p.RenderJSON(map[string]int{"status": http.StatusOK})
 }
 
 func (p Publications) DeleteAuthorFromPublication() revel.Result {
 	userID, err := middleware.ValidateJWT(p.Request, "auth_token")
 	if err != nil {
-		return p.Redirect("/login")
+		return p.RenderJSON(map[string]int{"status": http.StatusUnauthorized})
 	}
 	sUserID := fmt.Sprintf("%d", userID)
 	_ = models.DeleteDataFromRedis(sUserID)
@@ -140,8 +139,7 @@ func (p Publications) GetPublicationData(id uint64) revel.Result {
 	_, err := middleware.ValidateJWT(p.Request, "auth_token")
 	_, err2 := middleware.ValidateAdminJWT(p.Request, "auth_token_admin")
 	if err != nil && err2 != nil {
-		p.Response.Status = http.StatusUnauthorized
-		return p.Redirect("/login")
+		return p.RenderJSON(map[string]int{"status": http.StatusUnauthorized})
 	}
 	pub, err := models.GetPublicationByID(id)
 	if err != nil {
@@ -156,8 +154,7 @@ func (p Publications) DeletePublication() revel.Result {
 	_, err := middleware.ValidateJWT(p.Request, "auth_token")
 	_, err2 := middleware.ValidateAdminJWT(p.Request, "auth_token_admin")
 	if err != nil && err2 != nil {
-		p.Response.Status = http.StatusUnauthorized
-		return p.Redirect("/login")
+		return p.RenderJSON(map[string]int{"status": http.StatusUnauthorized})
 	}
 
 	pub := new(models.Publications)
@@ -186,8 +183,7 @@ func (p Publications) UpdatePublication() revel.Result {
 	userID, err := middleware.ValidateJWT(p.Request, "auth_token")
 	_, err2 := middleware.ValidateAdminJWT(p.Request, "auth_token_admin")
 	if err != nil && err2 != nil {
-		p.Response.Status = http.StatusUnauthorized
-		return p.Redirect("/login")
+		return p.RenderJSON(map[string]int{"status": http.StatusUnauthorized})
 	}
 
 	pub := new(models.Publications)
@@ -361,8 +357,7 @@ func (p Publications) AddProfilesToPublication(id uint64) revel.Result {
 func (p Publications) GetFileWithPublicationList() revel.Result {
 	userID, err := middleware.ValidateJWT(p.Request, "auth_token")
 	if err != nil {
-		//p.Response.Status = http.StatusUnauthorized
-		return p.Redirect("/login")
+		return p.RenderJSON(map[string]int{"status": http.StatusUnauthorized})
 	}
 	filters := new(models.PublicationDownloadFiltres)
 	err = p.Params.BindJSON(filters)

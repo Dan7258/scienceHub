@@ -26,13 +26,13 @@ PATCH   /tags/name/:name                        Tags.UpdateTagByName
 
 # ===== Управление научными публикациями =====
 # отображение списка публикаций (главная страница)
-GET     /                                       Publications.ShowPublications
+# GET     /                                       Publications.ShowPublications
 # получение данных всех публикаций
 GET     /getPublicationsData                    Publications.GetPublicationsData
 # отображение страницы создания публикации
-GET     /create-publication                     Publications.ShowCreatePublicationPage
+# GET     /create-publication                     Publications.ShowCreatePublicationPage
 # отображение страницы редактирования публикации
-GET     /update-publication                     Publications.ShowUpdatePublicationPage
+# GET     /update-publication                     Publications.ShowUpdatePublicationPage
 # получение данных публикации по ID для редактирования
 GET     /update-publication/:id                 Publications.GetPublicationData
 # получение публикаций с пагинацией
@@ -50,7 +50,7 @@ PATCH   /update-publication                     Publications.UpdatePublication
 
 # ===== Аутентификация и управление профилями =====
 # отображение профиля пользователя по ID
-GET     /user-profile/:id                       Profiles.ShowUserProfilePageByID
+# GET     /user-profile/:id                       Profiles.ShowUserProfilePageByID
 # получение данных профиля по ID
 GET     /profiles/id/:id                        Profiles.GetProfileByID
 # получение данных текущего пользователя
@@ -58,9 +58,9 @@ GET     /getUserData                            Profiles.GetUserData
 # получение ID и имен всех пользователей (для создания публикации)
 GET     /get-all-user-id-and-names              Profiles.GetUsersDataForCreatePublication
 # отображение страницы профиля текущего пользователя
-GET     /profile                                Profiles.ShowUserProfile
+# GET     /profile                                Profiles.ShowUserProfile
 # отображение страницы авторизации
-GET     /login                                  Profiles.ShowLoginPage
+# GET     /login                                  Profiles.ShowLoginPage
 # выход из системы и удаление сессии
 GET     /logout                                 Profiles.Logout
 # отображение страницы регистрации
@@ -86,7 +86,7 @@ POST    /settings/stop-change-email             Profiles.StopChangeEmail
 # отмена процесса смены пароля
 POST    /settings/stop-change-password          Profiles.StopChangePassword
 # отображение страницы настроек профиля
-GET     /settings                               Profiles.ShowSettingsPage
+# GET     /settings                               Profiles.ShowSettingsPage
 # подписка на профиль по ID
 POST    /subscribe/:id                          Profiles.AddSubscriberToProfile
 # удаление профиля текущего пользователя
@@ -98,11 +98,11 @@ PATCH   /profiles                               Profiles.UpdateProfileByID
 
 # ===== Социальные элементы и взаимодействие пользователей =====
 # отображение страницы со списком авторов
-GET     /authors                                Profiles.ShowAuthorsPage
+# GET     /authors                                Profiles.ShowAuthorsPage
 # отображение страницы с подписчиками текущего пользователя
-GET     /subscribers                            Profiles.ShowMySubscribers
+# GET     /subscribers                            Profiles.ShowMySubscribers
 # отображение страницы с подписками текущего пользователя
-GET     /subscribes                             Profiles.ShowMySubscribes
+# GET     /subscribes                             Profiles.ShowMySubscribes
 # получение списка авторов с пагинацией
 POST    /get-authors-paginator                  Profiles.GetAuthorsPaginator
 # получение списка подписчиков с пагинацией

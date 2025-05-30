@@ -16,7 +16,7 @@ type Profiles struct {
 	FirstName        string         `json:"first_name" gorm:"size:1000;not null" validate:"omitempty,min=3,max=1000"`
 	LastName         string         `json:"last_name" gorm:"size:1000;not null" validate:"omitempty,min=3,max=1000"`
 	MiddleName       string         `json:"middle_name" gorm:"size:1000;" validate:"max=1000"`
-	Gender           int            `json:"gender" validate:"omitempty,min=0,max=2"`
+	Gender           int            `json:"gender" validate:"omitempty,min=1,max=3"`
 	Country          string         `json:"country" gorm:"size:100;" validate:"max=100"`
 	AcademicDegree   string         `json:"academic_degree" gorm:"size:1000;" validate:"max=1000"`
 	VAC              string         `json:"vac" gorm:"size:1000;" validate:"max=1000"`
@@ -43,7 +43,7 @@ type SearchDataForProfiles struct {
 }
 
 func CreateProfile(profile *Profiles) error {
-	profile.Gender = 2
+	profile.Gender = 3
 	result := DB.Create(profile)
 	if result.Error != nil {
 		return result.Error

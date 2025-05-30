@@ -27,7 +27,8 @@ type DeleteAuthorFromPublication struct {
 func (p Publications) CreatePublication() revel.Result {
 	userID, err := middleware.ValidateJWT(p.Request, "auth_token")
 	if err != nil {
-		return p.RenderJSON(map[string]int{"status": http.StatusUnauthorized})
+		p.Response.Status = http.StatusUnauthorized
+		return nil
 	}
 	sUserID := fmt.Sprintf("%d", userID)
 	_ = models.DeleteDataFromRedis(sUserID)
@@ -37,7 +38,8 @@ func (p Publications) CreatePublication() revel.Result {
 	pub.OwnerID = userID
 	date := p.Params.Get("created_at")
 	if date != "" {
-		pub.CreatedAt, _ = time.Parse("02-01-2006", date)
+		pub.CreatedAt, err = time.Parse("2006-01-02", date)
+		fmt.Println(err)
 	}
 	validate := validator.New()
 	err = validate.Struct(pub)
@@ -119,7 +121,8 @@ func (p Publications) CreatePublication() revel.Result {
 func (p Publications) DeleteAuthorFromPublication() revel.Result {
 	userID, err := middleware.ValidateJWT(p.Request, "auth_token")
 	if err != nil {
-		return p.RenderJSON(map[string]int{"status": http.StatusUnauthorized})
+		p.Response.Status = http.StatusUnauthorized
+		return nil
 	}
 	sUserID := fmt.Sprintf("%d", userID)
 	_ = models.DeleteDataFromRedis(sUserID)
@@ -132,14 +135,16 @@ func (p Publications) DeleteAuthorFromPublication() revel.Result {
 		p.Response.Status = http.StatusInternalServerError
 		return p.RenderJSON(map[string]string{"error": err.Error()})
 	}
-	return p.RenderJSON(map[string]int{"status": http.StatusNoContent})
+	p.Response.Status = http.StatusNoContent
+	return nil
 }
 
 func (p Publications) GetPublicationData(id uint64) revel.Result {
 	_, err := middleware.ValidateJWT(p.Request, "auth_token")
 	_, err2 := middleware.ValidateAdminJWT(p.Request, "auth_token_admin")
 	if err != nil && err2 != nil {
-		return p.RenderJSON(map[string]int{"status": http.StatusUnauthorized})
+		p.Response.Status = http.StatusUnauthorized
+		return nil
 	}
 	pub, err := models.GetPublicationByID(id)
 	if err != nil {
@@ -154,7 +159,8 @@ func (p Publications) DeletePublication() revel.Result {
 	_, err := middleware.ValidateJWT(p.Request, "auth_token")
 	_, err2 := middleware.ValidateAdminJWT(p.Request, "auth_token_admin")
 	if err != nil && err2 != nil {
-		return p.RenderJSON(map[string]int{"status": http.StatusUnauthorized})
+		p.Response.Status = http.StatusUnauthorized
+		return nil
 	}
 
 	pub := new(models.Publications)
@@ -176,14 +182,16 @@ func (p Publications) DeletePublication() revel.Result {
 		revel.AppLog.Error(err.Error())
 	}
 
-	return p.RenderJSON(map[string]int{"status": http.StatusNoContent})
+	p.Response.Status = http.StatusNoContent
+	return nil
 }
 
 func (p Publications) UpdatePublication() revel.Result {
 	userID, err := middleware.ValidateJWT(p.Request, "auth_token")
 	_, err2 := middleware.ValidateAdminJWT(p.Request, "auth_token_admin")
 	if err != nil && err2 != nil {
-		return p.RenderJSON(map[string]int{"status": http.StatusUnauthorized})
+		p.Response.Status = http.StatusUnauthorized
+		return nil
 	}
 
 	pub := new(models.Publications)
@@ -196,7 +204,7 @@ func (p Publications) UpdatePublication() revel.Result {
 	pub.FileLink = p.Params.Get("fileLink")
 	date := p.Params.Get("created_at")
 	if date != "" {
-		pub.CreatedAt, _ = time.Parse("02-01-2006", date)
+		pub.CreatedAt, _ = time.Parse("2006-01-02", date)
 	}
 	sUserID := ownerIDStr
 	_ = models.DeleteDataFromRedis(sUserID)
@@ -277,7 +285,8 @@ func (p Publications) UpdatePublication() revel.Result {
 		return p.RenderJSON(map[string]string{"error": err.Error()})
 	}
 
-	return p.RenderJSON(map[string]int{"status": http.StatusNoContent})
+	p.Response.Status = http.StatusNoContent
+	return nil
 }
 
 func (p Publications) GetPublicationsData() revel.Result {
@@ -319,7 +328,8 @@ func (p Publications) AddTagsToPublication(id uint64) revel.Result {
 		return p.RenderJSON(map[string]string{"error": err.Error()})
 	}
 	p.Response.Status = http.StatusNoContent
-	return p.RenderJSON(map[string]int{"status": http.StatusNoContent})
+	p.Response.Status = http.StatusNoContent
+	return nil
 }
 
 func (p Publications) DeleteTagsFromPublication(id uint64) revel.Result {
@@ -335,7 +345,8 @@ func (p Publications) DeleteTagsFromPublication(id uint64) revel.Result {
 		return p.RenderJSON(map[string]string{"error": err.Error()})
 	}
 	p.Response.Status = http.StatusNoContent
-	return p.RenderJSON(map[string]int{"status": http.StatusNoContent})
+	p.Response.Status = http.StatusNoContent
+	return nil
 }
 
 func (p Publications) AddProfilesToPublication(id uint64) revel.Result {
@@ -351,13 +362,15 @@ func (p Publications) AddProfilesToPublication(id uint64) revel.Result {
 		return p.RenderJSON(map[string]string{"error": err.Error()})
 	}
 	p.Response.Status = http.StatusNoContent
-	return p.RenderJSON(map[string]int{"status": http.StatusNoContent})
+	p.Response.Status = http.StatusNoContent
+	return nil
 }
 
 func (p Publications) GetFileWithPublicationList() revel.Result {
 	userID, err := middleware.ValidateJWT(p.Request, "auth_token")
 	if err != nil {
-		return p.RenderJSON(map[string]int{"status": http.StatusUnauthorized})
+		p.Response.Status = http.StatusUnauthorized
+		return nil
 	}
 	filters := new(models.PublicationDownloadFiltres)
 	err = p.Params.BindJSON(filters)

@@ -51,7 +51,8 @@ func (p Profiles) SendVerificationCodeForRegister() revel.Result {
 func (p Profiles) SendVerificationCodeForChangeEmail() revel.Result {
 	userID, err := middleware.ValidateJWT(p.Request, "auth_token")
 	if err != nil {
-		return p.RenderJSON(map[string]int{"status": http.StatusUnauthorized})
+		p.Response.Status = http.StatusUnauthorized
+		return nil
 	}
 	sUserID := fmt.Sprintf("%d", userID)
 	profile := new(models.Profiles)
@@ -93,7 +94,8 @@ func (p Profiles) SendVerificationCodeForChangeEmail() revel.Result {
 func (p Profiles) VerifyAndChangeEmail() revel.Result {
 	userID, err := middleware.ValidateJWT(p.Request, "auth_token")
 	if err != nil {
-		return p.RenderJSON(map[string]int{"status": http.StatusUnauthorized})
+		p.Response.Status = http.StatusUnauthorized
+		return nil
 	}
 	sUserID := fmt.Sprintf("%d", userID)
 	var vprofile = new(models.VerifyProfile)
@@ -125,17 +127,20 @@ func (p Profiles) VerifyAndChangeEmail() revel.Result {
 	}
 	DeleteChangeEmailCode(sUserID)
 	_ = models.DeleteDataFromRedis(sUserID)
-	return p.RenderJSON(map[string]int{"status": http.StatusNoContent})
+	p.Response.Status = http.StatusOK
+	return nil
 }
 
 func (p Profiles) StopChangeEmail() revel.Result {
 	userID, err := middleware.ValidateJWT(p.Request, "auth_token")
 	if err != nil {
-		return p.RenderJSON(map[string]int{"status": http.StatusUnauthorized})
+		p.Response.Status = http.StatusUnauthorized
+		return nil
 	}
 	sUserID := fmt.Sprintf("%d", userID)
 	DeleteChangeEmailCode(sUserID)
-	return p.RenderJSON(map[string]int{"status": http.StatusNoContent})
+	p.Response.Status = http.StatusOK
+	return nil
 }
 
 func (p Profiles) SendVerificationCodeForChangePassword() revel.Result {
@@ -204,18 +209,21 @@ func (p Profiles) VerifyAndChangePassword() revel.Result {
 	}
 	DeleteChangePasswordCode(sUserID)
 	_ = models.DeleteDataFromRedis(sUserID)
-	return p.RenderJSON(map[string]int{"status": http.StatusOK})
+	p.Response.Status = http.StatusOK
+	return nil
 }
 
 func (p Profiles) StopChangePassword() revel.Result {
 	userID, err := middleware.ValidateJWT(p.Request, "auth_token")
 	if err != nil {
-		return p.RenderJSON(map[string]int{"status": http.StatusUnauthorized})
+		p.Response.Status = http.StatusUnauthorized
+		return nil
 	}
 	sUserID := fmt.Sprintf("%d", userID)
 
 	DeleteChangePasswordCode(sUserID)
-	return p.RenderJSON(map[string]int{"status": http.StatusOK})
+	p.Response.Status = http.StatusOK
+	return nil
 }
 
 func (p Profiles) VerifyAndCreateUser() revel.Result {
@@ -257,17 +265,20 @@ func (p Profiles) VerifyAndCreateUser() revel.Result {
 		revel.AppLog.Error(err.Error())
 		return p.RenderJSON(map[string]string{"error": err.Error()})
 	}
-	return p.RenderJSON(map[string]int{"status": http.StatusCreated})
+	p.Response.Status = http.StatusCreated
+	return nil
 }
 
 func (p Profiles) Login(login, password string) revel.Result {
 	user, err := models.GetProfileLoginData(login)
 	if err != nil {
-		return p.RenderJSON(map[string]int{"status": http.StatusUnauthorized})
+		p.Response.Status = http.StatusUnauthorized
+		return nil
 	}
 	err = bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(password))
 	if err != nil {
-		return p.RenderJSON(map[string]int{"status": http.StatusUnauthorized})
+		p.Response.Status = http.StatusUnauthorized
+		return nil
 	}
 	token, err := middleware.GenerateJWT(user.ID)
 
@@ -277,8 +288,8 @@ func (p Profiles) Login(login, password string) revel.Result {
 	}
 	middleware.SetCookieData(p.Controller, "auth_token", token, false)
 
-	p.Response.Status = http.StatusFound
-	return p.RenderJSON(map[string]int{"status": http.StatusOK})
+	p.Response.Status = http.StatusOK
+	return nil
 }
 
 func (p Profiles) Logout() revel.Result {
@@ -288,13 +299,15 @@ func (p Profiles) Logout() revel.Result {
 		_ = models.DeleteDataFromRedis(sUserID)
 	}
 	middleware.SetCookieData(p.Controller, "auth_token", "", true)
-	return p.RenderJSON(map[string]int{"status": http.StatusNoContent})
+	p.Response.Status = http.StatusNoContent
+	return nil
 }
 
 func (p Profiles) GetProfileByID(id uint64) revel.Result {
 	userID, err := middleware.ValidateJWT(p.Request, "auth_token")
 	if err != nil {
-		return p.RenderJSON(map[string]int{"status": http.StatusUnauthorized})
+		p.Response.Status = http.StatusUnauthorized
+		return nil
 	}
 	profile, err := models.GetProfileByID(id)
 	if err != nil {
@@ -312,7 +325,8 @@ func (p Profiles) GetProfileByID(id uint64) revel.Result {
 func (p Profiles) GetUserData() revel.Result {
 	userID, err := middleware.ValidateJWT(p.Request, "auth_token")
 	if err != nil {
-		return p.RenderJSON(map[string]int{"status": http.StatusUnauthorized})
+		p.Response.Status = http.StatusUnauthorized
+		return nil
 	}
 	profile := new(models.Profiles)
 	sUserID := fmt.Sprintf("%d", userID)
@@ -352,7 +366,9 @@ func (p Profiles) DeleteProfileByID(id uint64) revel.Result {
 	userID, err := middleware.ValidateJWT(p.Request, "auth_token")
 	_, err2 := middleware.ValidateAdminJWT(p.Request, "auth_token_admin")
 	if (err != nil || userID != id) && err2 != nil {
-		return p.RenderJSON(map[string]int{"status": http.StatusUnauthorized})
+		p.Response.Status = http.StatusUnauthorized
+		return nil
+
 	}
 	sUserID := fmt.Sprintf("%d", id)
 	err = models.DeleteProfileByID(id)
@@ -362,13 +378,15 @@ func (p Profiles) DeleteProfileByID(id uint64) revel.Result {
 	}
 	middleware.SetCookieData(p.Controller, "auth_token", "", true)
 	_ = models.DeleteDataFromRedis(sUserID)
-	return p.RenderJSON(map[string]int{"status": http.StatusNoContent})
+	p.Response.Status = http.StatusOK
+	return nil
 }
 
 func (p Profiles) DeleteProfileByLogin(login string) revel.Result {
 	_, err := middleware.ValidateJWT(p.Request, "auth_token")
 	if err != nil {
-		return p.RenderJSON(map[string]int{"status": http.StatusUnauthorized})
+		p.Response.Status = http.StatusUnauthorized
+		return nil
 	}
 	err = models.DeleteProfileByLogin(login)
 	if err != nil {
@@ -376,13 +394,15 @@ func (p Profiles) DeleteProfileByLogin(login string) revel.Result {
 		return p.RenderJSON(map[string]string{"error": err.Error()})
 	}
 	p.Response.Status = http.StatusNoContent
-	return p.RenderJSON(map[string]int{"status": http.StatusNoContent})
+	p.Response.Status = http.StatusOK
+	return nil
 }
 
 func (p Profiles) UpdateProfileByID() revel.Result {
 	userID, err := middleware.ValidateJWT(p.Request, "auth_token")
 	if err != nil {
-		return p.RenderJSON(map[string]int{"status": http.StatusUnauthorized})
+		p.Response.Status = http.StatusUnauthorized
+		return nil
 	}
 	sUserID := fmt.Sprintf("%d", userID)
 	profile := new(models.Profiles)
@@ -406,7 +426,8 @@ func (p Profiles) UpdateProfileByID() revel.Result {
 
 	p.Response.Status = http.StatusNoContent
 	_ = models.DeleteDataFromRedis(sUserID)
-	return p.RenderJSON(map[string]int{"status": http.StatusNoContent})
+	p.Response.Status = http.StatusNoContent
+	return nil
 }
 
 func (p Profiles) UpdateProfileByLogin(login string) revel.Result {
@@ -431,13 +452,15 @@ func (p Profiles) UpdateProfileByLogin(login string) revel.Result {
 	}
 
 	p.Response.Status = http.StatusNoContent
-	return p.RenderJSON(map[string]int{"status": http.StatusNoContent})
+	p.Response.Status = http.StatusNoContent
+	return nil
 }
 
 func (p Profiles) GetAllProfiles() revel.Result {
 	_, err := middleware.ValidateJWT(p.Request, "auth_token")
 	if err != nil {
-		return p.RenderJSON(map[string]int{"status": http.StatusUnauthorized})
+		p.Response.Status = http.StatusUnauthorized
+		return nil
 	}
 	profiles, err := models.GetAllProfiles()
 	if err != nil {
@@ -451,7 +474,8 @@ func (p Profiles) GetAllProfiles() revel.Result {
 func (p Profiles) GetAuthorsPaginator() revel.Result {
 	_, err := middleware.ValidateJWT(p.Request, "auth_token")
 	if err != nil {
-		return p.RenderJSON(map[string]int{"status": http.StatusUnauthorized})
+		p.Response.Status = http.StatusUnauthorized
+		return nil
 	}
 	searchData := new(models.SearchDataForProfiles)
 	err = p.Params.BindJSON(&searchData)
@@ -471,7 +495,8 @@ func (p Profiles) GetAuthorsPaginator() revel.Result {
 func (p Profiles) GetMySubscribersPaginator() revel.Result {
 	userID, err := middleware.ValidateJWT(p.Request, "auth_token")
 	if err != nil {
-		return p.RenderJSON(map[string]int{"status": http.StatusUnauthorized})
+		p.Response.Status = http.StatusUnauthorized
+		return nil
 	}
 	searchData := new(models.SearchDataForProfiles)
 	err = p.Params.BindJSON(&searchData)
@@ -491,7 +516,8 @@ func (p Profiles) GetMySubscribersPaginator() revel.Result {
 func (p Profiles) GetMySubscribesPaginator() revel.Result {
 	userID, err := middleware.ValidateJWT(p.Request, "auth_token")
 	if err != nil {
-		return p.RenderJSON(map[string]int{"status": http.StatusUnauthorized})
+		p.Response.Status = http.StatusUnauthorized
+		return nil
 	}
 	searchData := new(models.SearchDataForProfiles)
 	err = p.Params.BindJSON(&searchData)
@@ -511,7 +537,8 @@ func (p Profiles) GetMySubscribesPaginator() revel.Result {
 func (p Profiles) AddSubscriberToProfile(id uint64) revel.Result {
 	userID, err := middleware.ValidateJWT(p.Request, "auth_token")
 	if err != nil {
-		return p.RenderJSON(map[string]int{"status": http.StatusUnauthorized})
+		p.Response.Status = http.StatusUnauthorized
+		return nil
 	}
 	sUserID := fmt.Sprintf("%d", userID)
 	err = models.AddSubscriberToProfile(userID, id)
@@ -521,13 +548,15 @@ func (p Profiles) AddSubscriberToProfile(id uint64) revel.Result {
 	}
 	_ = models.DeleteDataFromRedis(sUserID)
 	_ = models.DeleteDataFromRedis(fmt.Sprintf("%d", id))
-	return p.RenderJSON(map[string]int{"status": http.StatusNoContent})
+	p.Response.Status = http.StatusNoContent
+	return nil
 }
 
 func (p Profiles) DeleteSubscriberFromProfile(id uint64) revel.Result {
 	userID, err := middleware.ValidateJWT(p.Request, "auth_token")
 	if err != nil {
-		return p.RenderJSON(map[string]int{"status": http.StatusUnauthorized})
+		p.Response.Status = http.StatusUnauthorized
+		return nil
 	}
 	sUserID := fmt.Sprintf("%d", userID)
 	err = models.DeleteSubscriberFromProfile(userID, id)
@@ -537,5 +566,6 @@ func (p Profiles) DeleteSubscriberFromProfile(id uint64) revel.Result {
 	}
 	_ = models.DeleteDataFromRedis(sUserID)
 	_ = models.DeleteDataFromRedis(fmt.Sprintf("%d", id))
-	return p.RenderJSON(map[string]int{"status": http.StatusNoContent})
+	p.Response.Status = http.StatusNoContent
+	return nil
 }

@@ -79,9 +79,9 @@ func getFormattedNameByID(ID uint64) string {
 	profile, _ := models.GetProfileNameByID(ID)
 	var gender petrovich.Gender
 	switch profile.Gender {
-	case 0:
-		gender = petrovich.Female
 	case 1:
+		gender = petrovich.Female
+	case 2:
 		gender = petrovich.Male
 	default:
 		gender = petrovich.Androgynous

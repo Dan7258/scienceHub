@@ -151,6 +151,12 @@ func createExcelDocument(userID uint64, publications []models.Publications) (str
 	font.SetSize(12)
 	style.SetFont(font)
 
+	row := sheet.AddRow()
+	SetCellParams(row.AddCell(), style, "СПИСОК")
+	SetCellParams(row.AddCell(), style, "учебно-методических и научных работ")
+	SetCellParams(row.AddCell(), style, getStrokeYearsInterval(publications))
+	SetCellParams(row.AddCell(), style, getFormattedNameByID(userID))
+
 	headers := []string{
 		"№",
 		"Наименование работы",
@@ -158,7 +164,7 @@ func createExcelDocument(userID uint64, publications []models.Publications) (str
 		"Дата публикации",
 		"Соавторы",
 	}
-	row := sheet.AddRow()
+	row = sheet.AddRow()
 
 	for i, header := range headers {
 		SetCellParams(row.AddCell(), boldStyle, header)

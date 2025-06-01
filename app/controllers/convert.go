@@ -18,6 +18,11 @@ import (
 	"strings"
 )
 
+const (
+	italic  = "\x1b[3m"
+	regular = "\x1b[0m"
+)
+
 func GetFileWithPublicationList(userID uint64, filters models.PublicationDownloadFiltres) (string, error) {
 	publications, err := models.GetPublicationListByFilters(userID, filters)
 	if err != nil {
@@ -43,6 +48,7 @@ func createWordDocument(userID uint64, publications []models.Publications) (stri
 
 	addStrokeCenter(doc, 16, "СПИСОК")
 	addStrokeCenter(doc, 12, "учебно-методических и научных работ")
+	addStrokeCenter(doc, 12, getStrokeYearsInterval(publications))
 	addStrokeCenter(doc, 12, getFormattedNameByID(userID))
 
 	doc.AddParagraph()
@@ -73,6 +79,18 @@ func createWordDocument(userID uint64, publications []models.Publications) (stri
 		return "", err
 	}
 	return filename, nil
+}
+
+func getStrokeYearsInterval(publications []models.Publications) string {
+	stroke := ""
+	if len(publications) == 0 {
+		stroke = fmt.Sprintf("за - г.г.")
+	} else {
+		startYear := publications[len(publications)-1].CreatedAt.Format("2006")
+		endYear := publications[0].CreatedAt.Format("2006")
+		stroke = fmt.Sprintf("за %s%s-%s%s г.г.", italic, startYear, endYear, regular)
+	}
+	return stroke
 }
 
 func getFormattedNameByID(ID uint64) string {

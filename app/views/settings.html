@@ -144,6 +144,17 @@
             margin-bottom: 20px;
             color: #6c757d;
         }
+        select {
+            width: 100%;
+            height: 48px;
+            padding: 12px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            font-size: 1em;
+            background-color: white;
+            font-family: inherit;
+        }
 
         /* Media */
         @media (max-width: 600px) {
@@ -283,6 +294,7 @@
                 document.getElementById('vac').placeholder = data.vac || 'ВАК';
                 document.getElementById('appointment').placeholder = data.appointment || 'Должность';
                 document.getElementById('new_login').placeholder = data.login || 'Текущий логин';
+                document.getElementById('gender').value = data.gender?.toString() || "3";
                 currentUserLogin = data.login || '';
             })
             .catch(error => {
@@ -413,7 +425,7 @@
         });
 
         function getNonEmptyFields() {
-            const fields = ['last_name', 'first_name', 'middle_name', 'country', 'academic_degree', 'vac', 'appointment', 'gender'];
+            const fields = ['last_name', 'first_name', 'middle_name', 'country', 'academic_degree', 'vac', 'appointment'];
             const data = {};
             fields.forEach(field => {
                 const value = document.getElementById(field).value.trim();
@@ -421,6 +433,10 @@
                     data[field] = value;
                 }
             });
+            const gender = document.getElementById('gender').value;
+            if (gender) {
+                data['gender'] = parseInt(gender, 10);
+            }
             return data;
         }
 

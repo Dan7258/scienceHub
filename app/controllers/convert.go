@@ -18,11 +18,6 @@ import (
 	"strings"
 )
 
-const (
-	italic  = "\x1b[3m"
-	regular = "\x1b[0m"
-)
-
 func GetFileWithPublicationList(userID uint64, filters models.PublicationDownloadFiltres) (string, error) {
 	publications, err := models.GetPublicationListByFilters(userID, filters)
 	if err != nil {
@@ -88,7 +83,7 @@ func getStrokeYearsInterval(publications []models.Publications) string {
 	} else {
 		startYear := publications[len(publications)-1].CreatedAt.Format("2006")
 		endYear := publications[0].CreatedAt.Format("2006")
-		stroke = fmt.Sprintf("за %s%s-%s%s г.г.", italic, startYear, endYear, regular)
+		stroke = fmt.Sprintf("за %s-%s г.г.", startYear, endYear)
 	}
 	return stroke
 }

@@ -194,6 +194,14 @@
                 <label for="appointment">Должность</label>
                 <input type="text" id="appointment" placeholder="Должность" />
             </div>
+            <div>
+                <label for="gender">Пол</label>
+                <select id="gender">
+                    <option value="3">Не указано</option>
+                    <option value="1">Женщина</option>
+                    <option value="2">Мужчина</option>
+                </select>
+            </div>
         </div>
         <button id="saveProfileButton">Сохранить</button>
     </section>
@@ -405,7 +413,7 @@
         });
 
         function getNonEmptyFields() {
-            const fields = ['last_name', 'first_name', 'middle_name', 'country', 'academic_degree', 'vac', 'appointment'];
+            const fields = ['last_name', 'first_name', 'middle_name', 'country', 'academic_degree', 'vac', 'appointment', 'gender'];
             const data = {};
             fields.forEach(field => {
                 const value = document.getElementById(field).value.trim();
@@ -471,10 +479,11 @@
         });
 
         verifyPasswordCodeButton.addEventListener('click', function() {
+            const currentPassword = document.getElementById('current_password').value;
             const newPassword = document.getElementById('new_password').value;
             const verificationCode = document.getElementById('password_verification_code').value.trim();
 
-            if (!newPassword || !verificationCode) {
+            if (!currentUserLogin || !currentPassword || !newPassword || !verificationCode) {
                 alert('Заполните все поля');
                 return;
             }
@@ -482,7 +491,14 @@
             fetch('/settings/verify-and-change-password', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ profile: { password: newPassword }, code: verificationCode }),
+                body: JSON.stringify({
+                    profile: {
+                        login: currentUserLogin,
+                        password: newPassword
+                    },
+                    old_password: currentPassword,
+                    code: verificationCode
+                }),
                 credentials: 'include'
             })
                 .then(response => {

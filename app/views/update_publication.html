@@ -163,18 +163,19 @@
             <label for="title" class="required">Заголовок статьи</label>
             <input type="text" id="title" name="title" required minlength="2" maxlength="1000">
         </div>
-
         <div class="form-group">
             <label for="abstract">Краткое описание</label>
             <textarea id="abstract" name="abstract" maxlength="1000"></textarea>
         </div>
-
         <div class="form-group">
             <label for="file">Файл статьи (PDF)</label>
             <input type="file" id="file" name="file" accept=".pdf">
             <div class="file-info" id="fileInfo">Текущий файл: <span id="fileLink"></span></div>
         </div>
-
+        <div class="form-group">
+            <label for="created_at" class="required">Дата издания</label>
+            <input type="date" id="created_at" name="created_at" required max="">
+        </div>
         <div class="form-group">
             <label for="coauthors">Соавторы</label>
             <select id="coauthors" name="coauthors[]" multiple></select>
@@ -184,7 +185,6 @@
             <label for="tags">Теги</label>
             <select id="tags" name="tags[]" multiple></select>
         </div>
-
         <div class="button-group">
             <button type="submit" class="btn">Сохранить изменения</button>
             <button type="button" class="btn btn-danger" id="deleteButton">Удалить публикацию</button>
@@ -251,7 +251,14 @@
                 document.getElementById("abstract").value = data.abstract || "";
                 document.getElementById("owner_id").value = data.owner_id;
                 document.getElementById("fileLinkHidden").value = data.file_link;
-
+                const createdAtInput = document.getElementById("created_at");
+                const today = new Date().toISOString().split('T')[0];
+                createdAtInput.max = today;
+                if (data.created_at) {
+                    createdAtInput.value = new Date(data.created_at).toISOString().split('T')[0];
+                } else {
+                    createdAtInput.value = today;
+                }
                 currentOwnerId = data.owner_id;
 
                 // Файл
@@ -310,7 +317,12 @@
 
             coauthorSelect.getValue().forEach(id => formData.append("coauthors[]", id));
             tagsSelect.getValue().forEach(id => formData.append("tags[]", id));
-
+            const createdAt = document.getElementById("created_at").value;
+            if (!createdAt) {
+                alert("Пожалуйста, укажите дату издания");
+                return;
+            }
+            formData.append("created_at", createdAt);
             fetch("/update-publication", {
                 method: "PATCH",
                 body: formData,

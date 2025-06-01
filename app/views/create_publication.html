@@ -170,7 +170,10 @@
       <div class="file-info" id="fileInfo">Файл не выбран</div>
       <div class="error" id="fileError"></div>
     </div>
-
+    <div class="form-group">
+      <label for="created_at" class="required">Дата издания</label>
+      <input type="date" id="created_at" name="created_at" required max="">
+    </div>
     <div class="form-group">
       <label for="coauthors">Соавторы</label>
       <select id="coauthors" name="coauthors[]" multiple placeholder="Выберите соавторов..."></select>
@@ -195,6 +198,10 @@
     const fileInput = document.getElementById('file');
     const fileInfo = document.getElementById('fileInfo');
     const fileError = document.getElementById('fileError');
+    const createdAtInput = document.getElementById('created_at');
+    const today = new Date().toISOString().split('T')[0];
+    createdAtInput.max = today;
+    createdAtInput.value = today;
 
     // Обработчик изменения файла
     fileInput.addEventListener('change', function() {
@@ -223,13 +230,13 @@
       create: true,
       load: function(query, callback) {
         fetch('/tags')
-                .then(response => response.json())
-                .then(json => {
-                  callback(json);
-                })
-                .catch(() => {
-                  callback();
-                });
+          .then(response => response.json())
+          .then(json => {
+            callback(json);
+          })
+          .catch(() => {
+            callback();
+          });
       },
       render: {
         option: function(item, escape) {
@@ -249,22 +256,22 @@
       placeholder: 'Выберите соавторов...',
       load: function(query, callback) {
         fetch('/get-all-user-id-and-names')
-                .then(response => response.json())
-                .then(users => {
-                  // Форматируем данные для TomSelect
-                  const formattedUsers = users.map(user => ({
-                    id: user.id,
-                    fullName: `${user.last_name} ${user.first_name} ${user.middle_name || ''}`.trim(),
-                    lastName: user.last_name,
-                    firstName: user.first_name,
-                    middleName: user.middle_name
-                  }));
-                  callback(formattedUsers);
-                })
-                .catch(error => {
-                  console.error('Ошибка загрузки пользователей:', error);
-                  callback();
-                });
+          .then(response => response.json())
+          .then(users => {
+            // Форматируем данные для TomSelect
+            const formattedUsers = users.map(user => ({
+              id: user.id,
+              fullName: `${user.last_name} ${user.first_name} ${user.middle_name || ''}`.trim(),
+              lastName: user.last_name,
+              firstName: user.first_name,
+              middleName: user.middle_name
+            }));
+            callback(formattedUsers);
+          })
+          .catch(error => {
+            console.error('Ошибка загрузки пользователей:', error);
+            callback();
+          });
       },
       render: {
         option: function(item, escape) {
@@ -307,23 +314,28 @@
       coauthorsSelect.getValue().forEach(coauthor => {
         formData.append('coauthors[]', coauthor);
       });
-
+      const createdAt = createdAtInput.value;
+      if (!createdAt) {
+        alert("Пожалуйста, укажите дату издания");
+        return;
+      }
+      formData.append('created_at', createdAt);
       // Отправка данных на сервер
       fetch('/create-publication', {
         method: 'POST',
         body: formData,
         credentials: 'include'
       })
-              .then(response => {
-                if (response.redirected) {
-                  window.location.href = response.url;
-                } else {
-                  return response.text(); // если надо логировать, можно оставить
-                }
-              })
-              .catch(error => {
-                alert('Произошла ошибка при отправке формы: ' + error.message);
-              });
+      .then(response => {
+        if (response.redirected) {
+          window.location.href = response.url;
+        } else {
+          return response.text();
+        }
+      })
+      .catch(error => {
+        alert('Произошла ошибка при отправке формы: ' + error.message);
+      });
     });
   });
 </script>

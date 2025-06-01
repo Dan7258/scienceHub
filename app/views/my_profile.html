@@ -492,6 +492,7 @@
             <p>Должность: <span id="appointment"></span></p>
             <p>Страна: <span id="country"></span></p>
             <p>Подписчики: <span id="subscribers_count"></span> | Подписки: <span id="subscriptions_count"></span></p>
+            <p>Пол: <span id="gender_display"></span></p>
         </div>
     </div>
 
@@ -579,6 +580,9 @@
     let sortOrder = 'desc'; // 'asc' or 'desc'
     let searchQuery = '';
 
+
+
+
     document.addEventListener("DOMContentLoaded", function() {
         closeFilterModal();
         fetch('/getUserData', { credentials: 'include' })
@@ -605,6 +609,9 @@
                 document.getElementById('appointment').innerText = data.appointment || 'Не указано';
                 document.getElementById('subscribers_count').innerText = data.SubscribersList?.length || 0;
                 document.getElementById('subscriptions_count').innerText = data.MySubscribesList?.length || 0;
+                const genderMap = { 1: "Женщина", 2: "Мужчина", 3: "Не указано" };
+                document.getElementById('gender_display').innerText = genderMap[data.gender] || "Не указано";
+                window.userGender = data.gender;
 
                 allPublications = data.Publications || [];
                 // Собираем уникальные теги по id
@@ -911,6 +918,11 @@
     }
 
     function downloadFilteredPublications() {
+        if (window.userGender === 3) {
+            alert("Пожалуйста, укажите ваш пол в настройках. Это важно!");
+            window.location.href = "/settings";
+            return;
+        }
         const count = parseInt(document.getElementById('count_publications').value);
         const dateStart = document.getElementById('date_start').value;
         const dateEnd = document.getElementById('date_end').value;

@@ -36,6 +36,11 @@ func (p Publications) CreatePublication() revel.Result {
 	pub.Title = p.Params.Get("title")
 	pub.Abstract = p.Params.Get("abstract")
 	pub.OwnerID = userID
+	date := p.Params.Get("created_at")
+	if date != "" {
+		pub.CreatedAt, err = time.Parse("2006-01-02", date)
+		fmt.Println(err)
+	}
 	validate := validator.New()
 	err = validate.Struct(pub)
 	if err != nil {
@@ -194,6 +199,10 @@ func (p Publications) UpdatePublication() revel.Result {
 	ownerIDStr := p.Params.Get("owner_id")
 	pub.OwnerID, err = strconv.ParseUint(ownerIDStr, 10, 64)
 	pub.FileLink = p.Params.Get("fileLink")
+	date := p.Params.Get("created_at")
+	if date != "" {
+		pub.CreatedAt, _ = time.Parse("2006-01-02", date)
+	}
 	sUserID := ownerIDStr
 	_ = models.DeleteDataFromRedis(sUserID)
 	validate := validator.New()

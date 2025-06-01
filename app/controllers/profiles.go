@@ -191,7 +191,17 @@ func (p Profiles) VerifyAndChangePassword() revel.Result {
 		return p.RenderJSON(map[string]string{"error": err.Error()})
 	}
 	revel.AppLog.Debugf("%v\n", vprofile)
-	pdata, _ := models.GetProfileLoginData(vprofile.Profile.Login)
+	pdata, err := models.GetProfileLoginData(vprofile.Profile.Login)
+	if err != nil {
+		revel.AppLog.Error(err.Error())
+		return p.RenderJSON(map[string]string{"error": "Не передан логин"})
+	}
+	err = bcrypt.CompareHashAndPassword([]byte(pdata.Password), []byte(vprofile.OldPassword))
+	if err != nil {
+		p.Response.Status = http.StatusForbidden
+		revel.AppLog.Error(err.Error())
+		return p.RenderJSON(map[string]string{"error": "Текущий пароль неверен"})
+	}
 	sUserID := fmt.Sprintf("%d", pdata.ID)
 	changePasswordCode, ok := GetChangePasswordCode(sUserID)
 	if !ok {
@@ -218,6 +228,54 @@ func (p Profiles) VerifyAndChangePassword() revel.Result {
 	DeleteChangePasswordCode(sUserID)
 	_ = models.DeleteDataFromRedis(sUserID)
 	return p.Redirect("/settings")
+}
+
+func (p Profiles) VerifyAndChangeForgetPassword() revel.Result {
+	var vprofile = new(models.VerifyProfile)
+	err := p.Params.BindJSON(vprofile)
+	if err != nil {
+		p.Response.Status = http.StatusBadRequest
+		return p.RenderJSON(map[string]string{"error": "Неверный запрос"})
+	}
+	validate := validator.New()
+	err = validate.Struct(vprofile.Profile)
+	if err != nil || vprofile.Code == "" {
+		p.Response.Status = http.StatusBadRequest
+		revel.AppLog.Error(err.Error())
+		return p.RenderJSON(map[string]string{"error": err.Error()})
+	}
+	revel.AppLog.Debugf("%v\n", vprofile)
+	pdata, err := models.GetProfileLoginData(vprofile.Profile.Login)
+	if err != nil {
+		revel.AppLog.Error(err.Error())
+		return p.RenderJSON(map[string]string{"error": "Не передан логин"})
+	}
+	sUserID := fmt.Sprintf("%d", pdata.ID)
+	changePasswordCode, ok := GetChangePasswordCode(sUserID)
+	if !ok {
+		p.Response.Status = http.StatusNotFound
+		return p.RenderJSON(map[string]string{"error": "Код подтверждения не найден или истек его срок. Пожалуйста, запросите новый код."})
+	}
+	if changePasswordCode != vprofile.Code {
+		p.Response.Status = http.StatusUnauthorized
+		return p.RenderJSON(map[string]string{"error": "Неверный код подтверждения"})
+	}
+	hashPassword, err := middleware.HashPassword(vprofile.Profile.Password)
+	if err != nil {
+		p.Response.Status = http.StatusInternalServerError
+		revel.AppLog.Error(err.Error())
+		return p.RenderJSON(map[string]string{"error": err.Error()})
+	}
+	vprofile.Profile.Password = hashPassword
+	err = models.UpdateProfileByID(pdata.ID, &vprofile.Profile)
+	if err != nil {
+		p.Response.Status = http.StatusInternalServerError
+		revel.AppLog.Error(err.Error())
+		return p.RenderJSON(map[string]string{"error": err.Error()})
+	}
+	DeleteChangePasswordCode(sUserID)
+	_ = models.DeleteDataFromRedis(sUserID)
+	return p.Redirect("/login")
 }
 
 func (p Profiles) StopChangePassword() revel.Result {

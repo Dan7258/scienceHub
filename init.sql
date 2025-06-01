@@ -5,6 +5,7 @@ CREATE TABLE profiles (
     first_Name VARCHAR(255) NOT NULL,
     last_name VARCHAR(255) NOT NULL,
     middle_name VARCHAR(255),
+    gender INTEGER,
     country VARCHAR(100),
     academic_degree VARCHAR(255),
     VAC VARCHAR(255),

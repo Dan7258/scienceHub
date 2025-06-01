@@ -22,8 +22,9 @@ type ChangePassword struct {
 }
 
 type VerifyProfile struct {
-	Profile Profiles
-	Code    string `json:"code"`
+	Profile     Profiles
+	Code        string `json:"code"`
+	OldPassword string `json:"old_password"`
 }
 
 //var VerificationEmailCodes sync.Map

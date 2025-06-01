@@ -16,6 +16,7 @@ type Profiles struct {
 	FirstName        string         `json:"first_name" gorm:"size:1000;not null" validate:"omitempty,min=3,max=1000"`
 	LastName         string         `json:"last_name" gorm:"size:1000;not null" validate:"omitempty,min=3,max=1000"`
 	MiddleName       string         `json:"middle_name" gorm:"size:1000;" validate:"max=1000"`
+	Gender           int            `json:"gender" validate:"omitempty,min=1,max=3"`
 	Country          string         `json:"country" gorm:"size:100;" validate:"max=100"`
 	AcademicDegree   string         `json:"academic_degree" gorm:"size:1000;" validate:"max=1000"`
 	VAC              string         `json:"vac" gorm:"size:1000;" validate:"max=1000"`
@@ -42,6 +43,7 @@ type SearchDataForProfiles struct {
 }
 
 func CreateProfile(profile *Profiles) error {
+	profile.Gender = 3
 	result := DB.Create(profile)
 	if result.Error != nil {
 		return result.Error
@@ -51,7 +53,7 @@ func CreateProfile(profile *Profiles) error {
 
 func GetProfileByID(ID uint64) (*Profiles, error) {
 	profile := new(Profiles)
-	result := DB.Select("id, first_name, last_name, middle_name, country, vac, appointment").
+	result := DB.Select("id, first_name, last_name, middle_name, gender, academic_degree, country, vac, appointment").
 		Preload("Publications.Profiles", func(db *gorm.DB) *gorm.DB {
 			return db.Select("id, first_name, last_name, middle_name")
 		}).
@@ -127,7 +129,7 @@ func GetAuthorsWithSearchParams(data SearchDataForProfiles) (GetSearchingDataFro
 	searchData := new(GetSearchingDataFromProfiles)
 	searchData.Data = make([]Profiles, 0)
 	var count int64
-	query := DB.Model(new(Profiles)).Select("id, first_name, last_name, middle_name, country, academic_degree, vac, appointment").
+	query := DB.Model(new(Profiles)).Select("id, first_name, last_name, middle_name, gender, country, academic_degree, vac, appointment").
 		Preload("Publications").
 		Preload("SubscribersList").
 		Preload("MySubscribesList")
@@ -179,7 +181,7 @@ func GetAllProfileIDAndNames() ([]Profiles, error) {
 
 func GetProfileNameByID(id uint64) (Profiles, error) {
 	var profile Profiles
-	result := DB.Select("id, first_name, last_name, middle_name").First(&profile, id)
+	result := DB.Select("id, first_name, last_name, middle_name, gender").First(&profile, id)
 	if result.Error != nil {
 		return profile, result.Error
 	}

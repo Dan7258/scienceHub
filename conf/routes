@@ -81,6 +81,8 @@ POST    /send-verification-code-for-change-password Profiles.SendVerificationCod
 POST    /settings/verify-and-change-email       Profiles.VerifyAndChangeEmail
 # проверка кода и смена пароля
 POST    /settings/verify-and-change-password    Profiles.VerifyAndChangePassword
+# проверка кода и смена забытого пароля
+POST    /verify-and-change-forget-password    Profiles.VerifyAndChangeForgetPassword
 # отмена процесса смены email
 POST    /settings/stop-change-email             Profiles.StopChangeEmail
 # отмена процесса смены пароля

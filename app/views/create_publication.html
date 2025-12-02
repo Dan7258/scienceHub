@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Создать публикацию</title>
+  <link href="https://cdn.jsdelivr.net/npm/tom-select@2.2.2/dist/css/tom-select.css" rel="stylesheet">
+  <style>
+    body {
+      font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+      background-color: #eef2f7;
+      margin: 0;
+      padding: 0;
+    }
+
+    .container {
+      max-width: 800px;
+      margin: 80px auto;
+      padding: 40px;
+      background-color: #ffffff;
+      border-radius: 16px;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+    }
+
+    h1 {
+      color: #222;
+      margin-bottom: 30px;
+      font-size: 28px;
+      font-weight: 600;
+    }
+
+    .form-group {
+      margin-bottom: 24px;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 10px;
+      font-weight: 600;
+      color: #444;
+    }
+
+    input[type="text"],
+    textarea,
+    select,
+    input[type="file"] {
+      width: 100%;
+      padding: 12px 14px;
+      font-size: 16px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      box-sizing: border-box;
+      transition: border 0.2s, box-shadow 0.2s;
+      background-color: #fff;
+    }
+    input[type="date"] {
+      width: 100%;
+      padding: 12px 14px;
+      font-size: 16px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      box-sizing: border-box;
+      background-color: #fff;
+      transition: border 0.2s, box-shadow 0.2s;
+    }
+
+    input[type="date"]:focus {
+      outline: none;
+      border-color: #5c9ded;
+      box-shadow: 0 0 0 3px rgba(92, 157, 237, 0.2);
+    }
+
+    input[type="text"]:focus,
+    textarea:focus,
+    select:focus,
+    input[type="file"]:focus {
+      outline: none;
+      border-color: #5c9ded;
+      box-shadow: 0 0 0 3px rgba(92, 157, 237, 0.2);
+    }
+
+    textarea {
+      min-height: 150px;
+      resize: vertical;
+    }
+
+    .required::after {
+      content: "*";
+      color: #e63946;
+      margin-left: 4px;
+    }
+
+    .btn {
+      display: inline-block;
+      background-color: #2563eb;
+      color: white;
+      padding: 12px 24px;
+      border: none;
+      border-radius: 8px;
+      font-size: 16px;
+      cursor: pointer;
+      transition: background-color 0.2s, transform 0.1s;
+    }
+
+    .btn:hover {
+      background-color: #1e4ed8;
+    }
+
+    .btn:active {
+      transform: scale(0.98);
+    }
+
+    .btn-back {
+      background-color: #6b7280;
+    }
+
+    .btn-back:hover {
+      background-color: #5a6268;
+    }
+
+    .button-group {
+      display: flex;
+      justify-content: space-between; /* Spread buttons to opposite edges */
+      gap: 10px;
+    }
+
+    .ts-wrapper {
+      margin-bottom: 24px;
+    }
+
+    .ts-control {
+      padding: 10px !important;
+      border-radius: 8px !important;
+      border-color: #ccc !important;
+    }
+
+    .ts-dropdown {
+      border-radius: 8px !important;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    }
+
+    .loading {
+      color: #888;
+      font-style: italic;
+    }
+
+    .file-info {
+      margin-top: 8px;
+      font-size: 14px;
+      color: #666;
+    }
+
+    .error {
+      color: #e63946;
+      font-size: 14px;
+      margin-top: 6px;
+    }
+
+    .no-results {
+      padding: 8px;
+      color: #999;
+      font-style: italic;
+    }
+  </style>
+</head>
+<body>
+{{template "header.html" .}}
+
+<div class="container">
+  <h1>Создать новую публикацию</h1>
+
+  <form id="publicationForm" action="/create-publication" method="POST" enctype="multipart/form-data">
+    <div class="form-group">
+      <label for="title" class="required">Заголовок статьи</label>
+      <input type="text" id="title" name="title" required minlength="2" maxlength="1000">
+    </div>
+
+    <div class="form-group">
+      <label for="abstract">Краткое описание</label>
+      <textarea id="abstract" name="abstract" maxlength="1000"></textarea>
+    </div>
+
+    <div class="form-group">
+      <label for="file" class="required">Файл статьи (PDF)</label>
+      <input type="file" id="file" name="file" accept=".pdf" required>
+      <div class="file-info" id="fileInfo">Файл не выбран</div>
+      <div class="error" id="fileError"></div>
+    </div>
+    <div class="form-group">
+      <label for="created_at" class="required">Дата издания</label>
+      <input type="date" id="created_at" name="created_at" required max="">
+    </div>
+    <div class="form-group">
+      <label for="coauthors">Соавторы</label>
+      <select id="coauthors" name="coauthors[]" multiple placeholder="Выберите соавторов..."></select>
+    </div>
+
+    <div class="form-group">
+      <label for="tags" class="required">Теги</label>
+      <select id="tags" name="tags[]" required multiple placeholder="Выберите теги..."></select>
+    </div>
+
+    <div class="button-group">
+      <button type="submit" class="btn">Опубликовать</button>
+      <button type="button" class="btn btn-back" onclick="window.location.href='/profile'">Назад</button>
+    </div>
+  </form>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/tom-select@2.2.2/dist/js/tom-select.complete.min.js"></script>
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    // Элементы для работы с файлом
+    const fileInput = document.getElementById('file');
+    const fileInfo = document.getElementById('fileInfo');
+    const fileError = document.getElementById('fileError');
+    const createdAtInput = document.getElementById('created_at');
+    const today = new Date().toISOString().split('T')[0];
+    createdAtInput.max = today;
+    createdAtInput.value = today;
+
+    // Обработчик изменения файла
+    fileInput.addEventListener('change', function() {
+      const file = this.files[0];
+      if (file) {
+        // Проверка формата файла
+        if (file.type !== 'application/pdf') {
+          fileError.textContent = 'Ошибка: разрешены только PDF-файлы';
+          this.value = '';
+          fileInfo.textContent = 'Файл не выбран';
+          return;
+        }
+
+        fileError.textContent = '';
+        fileInfo.textContent = `Выбран файл: ${file.name} (${(file.size / 1024).toFixed(2)} KB)`;
+      } else {
+        fileInfo.textContent = 'Файл не выбран';
+      }
+    });
+
+    // Инициализация выбора тегов
+    const tagsSelect = new TomSelect('#tags', {
+      valueField: 'id',
+      labelField: 'name',
+      searchField: 'name',
+      create: true,
+      load: function(query, callback) {
+        fetch('/tags')
+          .then(response => response.json())
+          .then(json => {
+            callback(json);
+          })
+          .catch(() => {
+            callback();
+          });
+      },
+      render: {
+        option: function(item, escape) {
+          return `<div>${escape(item.name)}</div>`;
+        },
+        item: function(item, escape) {
+          return `<div>${escape(item.name)}</div>`;
+        }
+      }
+    });
+
+    // Инициализация выбора соавторов
+    const coauthorsSelect = new TomSelect('#coauthors', {
+      valueField: 'id',
+      labelField: 'fullName',
+      searchField: ['id', 'lastName', 'firstName', 'middleName'],
+      placeholder: 'Выберите соавторов...',
+      load: function(query, callback) {
+        fetch('/get-all-user-id-and-names')
+          .then(response => response.json())
+          .then(users => {
+            // Форматируем данные для TomSelect
+            const formattedUsers = users.map(user => ({
+              id: user.id,
+              fullName: `${user.last_name} ${user.first_name} ${user.middle_name || ''}`.trim(),
+              lastName: user.last_name,
+              firstName: user.first_name,
+              middleName: user.middle_name
+            }));
+            callback(formattedUsers);
+          })
+          .catch(error => {
+            console.error('Ошибка загрузки пользователей:', error);
+            callback();
+          });
+      },
+      render: {
+        option: function(item, escape) {
+          return `<div>${escape(item.fullName)}</div>`;
+        },
+        item: function(item, escape) {
+          return `<div>${escape(item.fullName)}</div>`;
+        },
+        no_results: function(data, escape) {
+          return '<div class="no-results">Пользователи не найдены</div>';
+        }
+      },
+      shouldLoad: function(query) {
+        return query.length === 0 || query.length > 2; // Загружаем либо всех, либо при вводе >2 символов
+      }
+    });
+
+    // Обработка отправки формы
+    document.getElementById('publicationForm').addEventListener('submit', function(e) {
+      e.preventDefault();
+
+      // Дополнительная проверка файла перед отправкой
+      const file = fileInput.files[0];
+      if (file && file.type !== 'application/pdf') {
+        fileError.textContent = 'Ошибка: разрешены только PDF-файлы';
+        return;
+      }
+
+      // Создание FormData для отправки файла
+      const formData = new FormData();
+      formData.append('title', document.getElementById('title').value);
+      formData.append('abstract', document.getElementById('abstract').value);
+      formData.append('file', file);
+
+      // Добавление тегов и соавторов
+      tagsSelect.getValue().forEach(tag => {
+        formData.append('tags[]', tag);
+      });
+
+      coauthorsSelect.getValue().forEach(coauthor => {
+        formData.append('coauthors[]', coauthor);
+      });
+      const createdAt = createdAtInput.value;
+      if (!createdAt) {
+        alert("Пожалуйста, укажите дату издания");
+        return;
+      }
+      formData.append('created_at', createdAt);
+      // Отправка данных на сервер
+      fetch('/create-publication', {
+        method: 'POST',
+        body: formData,
+        credentials: 'include'
+      })
+      .then(response => {
+        if (response.redirected) {
+          window.location.href = response.url;
+        } else {
+          return response.text();
+        }
+      })
+      .catch(error => {
+        alert('Произошла ошибка при отправке формы: ' + error.message);
+      });
+    });
+  });
+</script>
+</body>
+</html>

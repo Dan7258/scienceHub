@@ -1,0 +1,816 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Главная страница</title>
+    <style>
+        :root {
+            --primary-color: #3498db;
+            --secondary-color: #2c3e50;
+            --text-color: #333;
+            --light-bg: #f4f7fa;
+            --card-bg: #fff;
+            --error-color: #e74c3c;
+            --muted-text: #7f8c8d;
+            --border-color: #e5e7eb;
+            --add-color: #2ecc71;
+            --remove-color: #e74c3c;
+            --tag-selected-color: #1d4ed8;
+            --tag-unselected-color: #ecf0f1;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            background-color: var(--light-bg);
+            margin: 0;
+            padding: 0;
+            color: var(--text-color);
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: min(900px, 95%);
+            margin: 80px auto 20px auto;
+            padding: 1.5rem;
+            background: var(--card-bg);
+            border-radius: 10px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            color: var(--secondary-color);
+            border-bottom: 2px solid #5882C1;
+            padding-bottom: 0.5rem;
+            margin-bottom: 1.5rem;
+            font-size: clamp(1.5rem, 4vw, 1.8rem);
+        }
+
+        .search-bar {
+            margin-bottom: 1.5rem;
+            display: flex;
+            gap: 0.75rem;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .search-bar input {
+            flex: 1;
+            min-width: 200px;
+            padding: 0.75rem;
+            font-size: 1rem;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            outline: none;
+            transition: border-color 0.2s ease;
+        }
+
+        .search-bar input:focus {
+            border-color: var(--primary-color);
+        }
+
+        .search-bar button {
+            padding: 0.75rem 1.5rem;
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 4px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+            white-space: nowrap;
+        }
+
+        .search-bar button:hover {
+            background: #2980b9;
+        }
+
+        .search-bar select {
+            padding: 0.75rem;
+            font-size: 1rem;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            outline: none;
+            transition: border-color 0.2s ease;
+            background: white;
+        }
+
+        .search-bar select:focus {
+            border-color: var(--primary-color);
+        }
+
+        .reset-all-button {
+            background: var(--error-color) !important;
+        }
+
+        .reset-all-button:hover {
+            background: #c0392b !important;
+        }
+
+        .publication {
+            background: #f9fafb;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+            margin-bottom: 20px;
+            border: 1px solid var(--border-color);
+        }
+
+        .pagination-controls {
+            text-align: center;
+            margin-top: 2rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 1rem;
+        }
+
+        .pagination-controls button {
+            padding: 0.75rem 1.5rem;
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 4px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+        }
+
+        .pagination-controls button:hover {
+            background: #2980b9;
+        }
+
+        .pagination-controls button:disabled {
+            background: var(--muted-text);
+            cursor: not-allowed;
+        }
+
+        .page-info {
+            font-size: 1rem;
+            color: var(--text-color);
+            margin: 0 1rem;
+            min-width: 120px;
+        }
+
+        .publication h2 {
+            margin: 0 0 10px;
+            font-size: 17px;
+            font-weight: 600;
+        }
+
+        .publication p {
+            font-size: 14px;
+            margin: 6px 0;
+        }
+
+        .publication .profiles {
+            margin-top: 10px;
+        }
+
+        .publication .profiles a {
+            display: inline-block;
+            background: #5882C1;
+            color: white;
+            padding: 0.35rem 0.75rem;
+            border-radius: 4px;
+            font-size: 0.875rem;
+            text-decoration: none;
+            transition: all 0.2s ease;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            border: 1px solid #5882C1;
+            margin-right: 0.5rem;
+            margin-top: 0.25rem;
+        }
+
+        .publication .profiles a:hover {
+            background: #1d4ed8;
+            transform: translateY(-1px);
+            box-shadow: 0 2px 5px rgba(0,0,0,0.15);
+        }
+
+        .publication .tags {
+            margin-top: 10px;
+        }
+
+        .publication .tags span {
+            display: inline-block;
+            color: #3178c6;
+            background-color: #f0f6ff;
+            padding: 0.1rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.875rem;
+            margin-right: 0.5rem;
+            margin-top: 0.25rem;
+            border: none;
+        }
+
+        .loading {
+            color: var(--muted-text);
+            font-style: italic;
+            text-align: center;
+            padding: 2rem;
+        }
+
+        .download-link {
+            display: inline-block;
+            margin-top: 10px;
+            color: #4D38D7;
+            text-decoration: none;
+            font-weight: 500;
+            margin-right: 15px;
+        }
+
+        .error-message {
+            color: var(--error-color);
+            text-align: center;
+            padding: 2rem;
+        }
+
+        .skeleton {
+            animation: pulse 1.5s infinite ease-in-out;
+            background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+            background-size: 200% 100%;
+            border-radius: 4px;
+            margin-bottom: 1rem;
+            height: 1.5rem;
+        }
+
+        @keyframes pulse {
+            0% { background-position: 200% 0; }
+            100% { background-position: -200% 0; }
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+
+        .modal-content {
+            background: var(--card-bg);
+            padding: 1.5rem;
+            border-radius: 8px;
+            max-width: 500px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .modal-header h2 {
+            margin: 0;
+            font-size: 1.25rem;
+            color: var(--secondary-color);
+        }
+
+        .close-button {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: var(--muted-text);
+        }
+
+        .tag-search {
+            width: 100%;
+            padding: 0.75rem;
+            font-size: 1rem;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            margin-bottom: 1rem;
+            outline: none;
+            transition: border-color 0.2s ease;
+        }
+
+        .tag-search:focus {
+            border-color: var(--primary-color);
+        }
+
+        .tag-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+
+        .tag {
+            padding: 6px 12px;
+            border-radius: 8px;
+            background-color: var(--tag-unselected-color);
+            color: var(--text-color);
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            user-select: none;
+            border: 1px solid var(--border-color);
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+
+        .tag.selected {
+            background: var(--tag-selected-color);
+            color: white;
+            border-color: var(--tag-selected-color);
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+        }
+
+        .tag:hover {
+            background-color: #d0d0d0;
+            transform: scale(1.05);
+        }
+
+        .tag.selected:hover {
+            background: #1d4ed8;
+            transform: scale(1.05);
+        }
+
+        .modal-footer {
+            margin-top: 1rem;
+            display: flex;
+            justify-content: flex-end;
+            gap: 0.5rem;
+        }
+
+        .apply-button, .back-button {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 1rem;
+            color: white;
+        }
+
+        .apply-button {
+            background: var(--primary-color);
+        }
+
+        .apply-button:hover {
+            background: #2980b9;
+        }
+
+        .back-button {
+            background: var(--muted-text);
+        }
+
+        .back-button:hover {
+            background: #6b7280;
+        }
+
+        .reset-filters-button {
+            padding: 0.75rem 1.5rem;
+            background: var(--error-color);
+            color: white;
+            border: none;
+            border-radius: 4px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+        }
+
+        .reset-filters-button:hover {
+            background: #c0392b;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 1rem;
+            }
+
+            .search-bar {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .search-bar input {
+                min-width: 100%;
+            }
+
+            .search-bar button, .search-bar select {
+                width: 100%;
+                padding: 0.75rem;
+            }
+
+            .pagination-controls {
+                flex-direction: column;
+                gap: 0.5rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            h1 {
+                font-size: clamp(1.2rem, 5vw, 1.5rem);
+            }
+        }
+    </style>
+</head>
+<body>
+{{template "header.html"}}
+<div class="container">
+    <h1>Публикации</h1>
+    <div class="search-bar">
+        <input type="text" id="searchInput" placeholder="Поиск публикаций...">
+        <select id="sortSelect">
+            <option value="1" selected>По дате (новые)</option>
+            <option value="0">По дате (старые)</option>
+            <option value="2">По названию (А-Я)</option>
+            <option value="3">По названию (Я-А)</option>
+        </select>
+        <select id="countSelect">
+            <option value="5">5 на странице</option>
+            <option value="10" selected>10 на странице</option>
+            <option value="15">15 на странице</option>
+            <option value="20">20 на странице</option>
+        </select>
+        <button class="filter-button" onclick="openFilterModal()">Фильтры</button>
+        <button class="reset-all-button" onclick="resetAll()">Сбросить всё</button>
+    </div>
+    <div id="publications">
+        <!-- Skeleton loader -->
+        <div class="skeleton" style="width: 80%;"></div>
+        <div class="skeleton" style="width: 60%;"></div>
+        <div class="skeleton" style="width: 70%; height: 100px;"></div>
+        <div class="skeleton" style="width: 50%;"></div>
+    </div>
+    <div class="pagination-controls">
+        <button id="prevPage" onclick="loadPreviousPage()" disabled>← Назад</button>
+        <span id="pageInfo" class="page-info">Страница 1 из 1</span>
+        <button id="nextPage" onclick="loadNextPage()" disabled>Вперёд →</button>
+    </div>
+</div>
+
+<div class="modal" id="filterModal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2>Выберите теги</h2>
+            <button class="close-button" onclick="closeFilterModal()">×</button>
+        </div>
+        <input type="text" class="tag-search" id="tagSearch" placeholder="Поиск тегов...">
+        <div class="tag-list" id="tagList"></div>
+        <div class="modal-footer">
+            <button class="reset-filters-button" onclick="resetFilters()">Сбросить фильтры</button>
+            <button class="back-button" onclick="closeFilterModal()">Назад</button>
+            <button class="apply-button" onclick="applyFilters()">Применить</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    let allPublications = [];
+    let allTags = [];
+    let selectedTags = [];
+    let searchData = {
+        title: "",
+        tags: [],
+        page: 1,
+        count: 10,
+        sort: 1  // SortDateDesc - по умолчанию новые публикации первыми
+    };
+    let maxPages = 1;
+
+    document.addEventListener("DOMContentLoaded", function() {
+        closeFilterModal();
+        setTimeout(() => {
+            loadPublications();
+            loadTags();
+        }, 300);
+
+        document.getElementById('searchInput').addEventListener('input', function(e) {
+            const searchValue = e.target.value.trim();
+            searchData.title = searchValue.length >= 2 ? searchValue : "";
+            searchData.page = 1;
+            loadPublications();
+        });
+
+        document.getElementById('searchInput').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                const searchValue = e.target.value.trim();
+                searchData.title = searchValue.length >= 2 ? searchValue : "";
+                searchData.page = 1;
+                loadPublications();
+            }
+        });
+
+        document.getElementById('sortSelect').addEventListener('change', function(e) {
+            searchData.sort = parseInt(e.target.value);
+            searchData.page = 1;
+            loadPublications();
+        });
+
+        document.getElementById('countSelect').addEventListener('change', function(e) {
+            searchData.count = parseInt(e.target.value);
+            searchData.page = 1;
+            loadPublications();
+        });
+    });
+
+    function loadPublications() {
+        const publicationsContainer = document.getElementById('publications');
+        const prevButton = document.getElementById('prevPage');
+        const nextButton = document.getElementById('nextPage');
+        const pageInfo = document.getElementById('pageInfo');
+
+        searchData.tags = selectedTags.length > 0 ? selectedTags.map(Number) : [];
+
+        publicationsContainer.innerHTML = `
+            <div class="skeleton" style="width: 80%;"></div>
+            <div class="skeleton" style="width: 60%;"></div>
+            <div class="skeleton" style="width: 70%; height: 100px;"></div>
+            <div class="skeleton" style="width: 50%;"></div>
+        `;
+
+        fetch('/get-publications-paginator', {
+            method: 'POST',
+            credentials: 'include',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+                'Cache-Control': 'no-cache'
+            },
+            body: JSON.stringify(searchData)
+        })
+            .then(async response => {
+                if (response.status === 401) {
+                    if (!window.location.pathname.includes('/login')) {
+                        window.location.href = '/login';
+                    }
+                    return;
+                }
+
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+
+                const responseData = await response.json();
+                console.log('Loaded publications:', responseData);
+
+                allPublications = responseData.data || [];
+                maxPages = responseData.max_pages || 1;
+
+                renderPublications(allPublications);
+                updatePaginationControls();
+            })
+            .catch(error => {
+                console.error('Ошибка при получении публикаций:', error);
+                showError();
+            });
+    }
+
+    function updatePaginationControls() {
+        const prevButton = document.getElementById('prevPage');
+        const nextButton = document.getElementById('nextPage');
+        const pageInfo = document.getElementById('pageInfo');
+
+        pageInfo.textContent = `Страница ${searchData.page} из ${maxPages}`;
+        prevButton.disabled = searchData.page <= 1;
+        nextButton.disabled = searchData.page >= maxPages;
+    }
+
+    function loadNextPage() {
+        if (searchData.page < maxPages) {
+            searchData.page++;
+            loadPublications();
+        }
+    }
+
+    function loadPreviousPage() {
+        if (searchData.page > 1) {
+            searchData.page--;
+            loadPublications();
+        }
+    }
+
+    function loadTags() {
+        fetch('/tags', {
+            credentials: 'include',
+            headers: {
+                'Accept': 'application/json',
+                'Cache-Control': 'no-cache'
+            }
+        })
+            .then(async response => {
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+
+                const tags = await response.json();
+                console.log('Loaded tags:', tags);
+                allTags = tags;
+                renderTagsInModal(tags);
+            })
+            .catch(error => {
+                console.error('Ошибка при получении тегов:', error);
+                document.getElementById('tagList').innerHTML = '<p class="error-message">Ошибка загрузки тегов</p>';
+            });
+    }
+
+    function filterTags() {
+        const searchValue = document.getElementById('tagSearch').value.toLowerCase();
+        const filteredTags = allTags.filter(tag =>
+            (tag.name || '').toLowerCase().includes(searchValue)
+        );
+        renderTagsInModal(filteredTags);
+    }
+
+    function renderTagsInModal(tags) {
+        const tagList = document.getElementById('tagList');
+        tagList.innerHTML = '';
+
+        if (!tags || tags.length === 0) {
+            tagList.innerHTML = '<p class="loading">Теги не найдены</p>';
+            return;
+        }
+
+        const selectedTagsList = tags.filter(tag => selectedTags.includes(Number(tag.id)));
+        const unselectedTagsList = tags.filter(tag => !selectedTags.includes(Number(tag.id)));
+
+        const fragment = document.createDocumentFragment();
+
+        selectedTagsList.forEach(tag => {
+            const tagElement = createTagElement(tag, true);
+            fragment.appendChild(tagElement);
+        });
+
+        unselectedTagsList.forEach(tag => {
+            const tagElement = createTagElement(tag, false);
+            fragment.appendChild(tagElement);
+        });
+
+        tagList.appendChild(fragment);
+    }
+
+    function createTagElement(tag, isSelected) {
+        const tagElement = document.createElement('div');
+        tagElement.className = 'tag';
+        if (isSelected) {
+            tagElement.classList.add('selected');
+        }
+        tagElement.dataset.tagId = tag.id;
+        tagElement.textContent = escapeHtml(tag.name || 'Без названия');
+        tagElement.onclick = () => toggleTag(Number(tag.id), tagElement);
+        return tagElement;
+    }
+
+    function toggleTag(tagId, element) {
+        tagId = Number(tagId);
+        if (selectedTags.includes(tagId)) {
+            selectedTags = selectedTags.filter(id => id !== tagId);
+            element.classList.remove('selected');
+        } else {
+            selectedTags.push(tagId);
+            element.classList.add('selected');
+        }
+        filterTags();
+    }
+
+    function applyFilters() {
+        closeFilterModal();
+        searchData.tags = selectedTags.length > 0 ? selectedTags.map(Number) : [];
+        searchData.page = 1;
+        loadPublications();
+    }
+
+    function resetFilters() {
+        selectedTags = [];
+        applyFilters();
+    }
+
+    function resetAll() {
+        selectedTags = [];
+        searchData.title = '';
+        searchData.tags = [];
+        searchData.page = 1;
+        searchData.sort = 1;  // SortDateDesc
+        searchData.count = 10;
+        document.getElementById('searchInput').value = '';
+        document.getElementById('sortSelect').value = '1';
+        document.getElementById('countSelect').value = '10';
+        loadPublications();
+    }
+
+    function openFilterModal() {
+        document.getElementById('filterModal').style.display = 'flex';
+        document.getElementById('tagSearch').value = '';
+        filterTags();
+    }
+
+    function closeFilterModal() {
+        document.getElementById('filterModal').style.display = 'none';
+    }
+
+    function renderPublications(data) {
+        const publicationsContainer = document.getElementById('publications');
+
+        if (!data || data.length === 0) {
+            publicationsContainer.innerHTML = '<p class="loading">Публикаций нет</p>';
+            return;
+        }
+
+        const fragment = document.createDocumentFragment();
+
+        data.forEach(pub => {
+            const div = document.createElement('div');
+            div.className = 'publication';
+
+            div.innerHTML = `
+                <h2>${escapeHtml(pub.title || 'Без названия')}</h2>
+                <p><strong>Аннотация:</strong> ${escapeHtml(pub.abstract || 'Абстракт не указан')}</p>
+                <p><strong>Создано:</strong> ${new Date(pub.created_at).toLocaleDateString()}</p>
+                <p><strong>Обновлено:</strong> ${new Date(pub.updated_at).toLocaleDateString()}</p>
+                <div class="profiles">
+                    Авторы: ${renderProfiles(pub.profiles)}
+                </div>
+                <div class="tags">
+                    Теги: ${renderTags(pub.tags)}
+                </div>
+                ${pub.file_link ?
+                `<a href="${escapeHtml(pub.file_link)}" class="download-link" target="_blank" rel="noopener">
+                    📄 Скачать статью (PDF)
+                </a>` : ''
+            }
+            `;
+
+            fragment.appendChild(div);
+        });
+
+        publicationsContainer.innerHTML = '';
+        publicationsContainer.appendChild(fragment);
+    }
+
+    function renderProfiles(profiles) {
+        if (!profiles || profiles.length === 0) {
+            return 'Авторы не указаны';
+        }
+
+        return profiles.map(profile => {
+            const name = `${profile.first_name || ''} ${profile.last_name || ''}`.trim() || 'Неизвестный автор';
+            return `<a href="/user-profile/${escapeHtml(profile.id)}">${escapeHtml(name)}</a>`;
+        }).join('');
+    }
+
+    function renderTags(tags) {
+        if (!tags || tags.length === 0) {
+            return 'Теги не указаны';
+        }
+
+        return tags.map(tag => {
+            return `<span>${escapeHtml(tag.name || 'Без названия')}</span>`;
+        }).join('');
+    }
+
+    function escapeHtml(unsafe) {
+        if (!unsafe) return '';
+        return unsafe.toString()
+            .replace(/&/g, "&amp;")
+            .replace(/</g, "&lt;")
+            .replace(/>/g, "&gt;")
+            .replace(/"/g, "&quot;")
+            .replace(/'/g, "&#039;");
+    }
+
+    function showError() {
+        const publicationsContainer = document.getElementById('publications');
+        publicationsContainer.innerHTML = `
+            <p class="error-message">
+                Ошибка при загрузке публикаций. Пожалуйста, попробуйте позже.
+                <button onclick="loadPublications()" style="
+                    margin-top: 1rem;
+                    padding: 0.75rem 1.5rem;
+                    background: var(--primary-color);
+                    color: white;
+                    border: none;
+                    border-radius: 4px;
+                    cursor: pointer;
+                    font-size: 1rem;
+                ">
+                    Повторить попытку
+                </button>
+            </p>
+        `;
+    }
+
+    // Initialize tag search functionality
+    document.addEventListener('DOMContentLoaded', function() {
+        const tagSearch = document.getElementById('tagSearch');
+        if (tagSearch) {
+            tagSearch.addEventListener('input', filterTags);
+        }
+    });
+</script>
+</body>
+</html>

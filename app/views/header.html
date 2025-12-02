@@ -1,0 +1,215 @@
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+<head>
+  <link rel="icon" href="../../public/img/favicon.png" type="image/png">
+</head>
+<header>
+  <div class="nav-container">
+    <div class="burger-menu" onclick="toggleMenu()">
+      <div class="bar"></div>
+      <div class="bar"></div>
+      <div class="bar"></div>
+    </div>
+    <div class="logo-container">
+      <!-- Заменяем Font Awesome иконку на вашу -->
+      <img src="../../public/img/logo.png" alt="ScienceHub Icon" class="logo-icon">
+      <span class="logo-text">SCIENCEHUB</span>
+    </div>
+    <div class="menu" id="menu">
+      <div class="close-btn" onclick="toggleMenu()">
+        <i class="fas fa-times"></i>
+      </div>
+      <a href="/">Главная</a>
+      <a href="/profile">Профиль</a>
+      <a href="/authors">Авторы</a>
+      <a href="/subscribes">Подписки</a>
+      <a href="/subscribers">Подписчики</a>
+      <a href="/settings">Настройки</a>
+      <a href="/logout" id="logout" class="logout-btn"><i class="fas fa-sign-out-alt"></i> Выйти</a>
+    </div>
+  </div>
+</header>
+
+<style>
+  .close-btn {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    cursor: pointer;
+    color: #2c3e50;
+    font-size: 1.5rem;
+    transition: color 0.3s;
+  }
+
+  .close-btn:hover {
+    color: #e74c3c;
+  }
+
+  header {
+    background: #f8f9fa;
+    padding: 15px 10px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    z-index: 1000;
+    border-bottom: 1px solid #4D38D7;
+  }
+
+  .nav-container {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .burger-menu {
+    display: flex;
+    flex-direction: column;
+    cursor: pointer;
+    z-index: 1001;
+    margin-right: 10px;
+  }
+
+  .burger-menu .bar {
+    width: 25px;
+    height: 3px;
+    background-color: #4D38D7;
+    margin: 4px 0;
+    transition: all 0.3s ease;
+  }
+
+  .logo-container {
+    display: flex;
+    align-items: center;
+    color: #4D38D7;
+    font-size: 1.5rem;
+    font-weight: bold;
+    gap: 10px;
+    flex-grow: 1;
+    margin-left: 15px;
+  }
+
+  .logo-icon {
+    width: 30px; /* Устанавливаем размер иконки */
+    height: 30px;
+    object-fit: contain; /* Сохраняем пропорции */
+  }
+
+  .logo-text {
+    font-family: 'Arial', sans-serif;
+    letter-spacing: 1px;
+  }
+
+  .menu {
+    position: fixed;
+    top: 0;
+    left: 0;
+    transform: translateX(-100%);
+    width: 250px;
+    height: 100vh;
+    background: rgba(88, 130, 193, 0.15);
+    border-right: 2px solid #5882C1;
+    border-top-right-radius: 8px;
+    border-bottom-right-radius: 8px;
+    flex-direction: column;
+    padding: 80px 20px 20px;
+    box-shadow: 2px 0 5px rgba(0,0,0,0.1);
+    transition: transform 0.3s ease;
+    z-index: 1000;
+    backdrop-filter: blur(8px);
+  }
+
+  .menu.active {
+    transform: translateX(0);
+  }
+
+  .menu a {
+    color: black;
+    text-decoration: none;
+    padding: 15px;
+    font-size: 1.1rem;
+    border-radius: 5px;
+    transition: background 0.3s;
+    font-weight: 500;
+    display: block;
+    margin: 5px 0;
+  }
+
+  .menu a:hover {
+    background: rgba(88, 130, 193, 0.3);
+  }
+
+  .logout-btn {
+    background: transparent;
+    color: #2c3e50;
+    padding: 15px;
+    border-radius: 5px;
+    text-decoration: none;
+    transition: background 0.3s;
+    font-size: 1.1rem;
+    display: flex;
+    align-items: center;
+    justify-content: start;
+    gap: 10px;
+    margin-top: 20px;
+  }
+
+  .logout-btn:hover {
+    background: rgba(88, 130, 193, 0.3);
+  }
+
+  .logout-btn i {
+    font-size: 1.3rem;
+  }
+
+  .burger-menu.active {
+    display: none;
+  }
+
+  .burger-menu.active .bar:nth-child(1) {
+    transform: rotate(45deg) translate(5px, 5px);
+  }
+
+  .burger-menu.active .bar:nth-child(2) {
+    opacity: 0;
+  }
+
+  .burger-menu.active .bar:nth-child(3) {
+    transform: rotate(-45deg) translate(7px, -6px);
+  }
+</style>
+
+<script>
+  function toggleMenu() {
+    const menu = document.getElementById("menu");
+    const burger = document.querySelector(".burger-menu");
+    const body = document.body;
+
+    menu.classList.toggle("active");
+    burger.classList.toggle("active");
+
+    const isOpen = menu.classList.contains("active");
+
+    if (isOpen) {
+      const scrollBarWidth = window.innerWidth - document.documentElement.clientWidth;
+      body.style.overflow = "hidden";
+      body.style.paddingRight = scrollBarWidth + "px";
+    } else {
+      body.style.overflow = "";
+      body.style.paddingRight = "";
+    }
+  }
+
+  document.addEventListener('click', function(event) {
+    const menu = document.getElementById("menu");
+    const burger = document.querySelector(".burger-menu");
+    const body = document.body;
+
+    if (!menu.contains(event.target) && !event.target.closest('.burger-menu') && menu.classList.contains('active')) {
+      menu.classList.remove("active");
+      burger.classList.remove("active");
+      body.style.overflow = "";
+      body.style.paddingRight = "";
+    }
+  });
+</script>

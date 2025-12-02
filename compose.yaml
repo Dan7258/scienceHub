@@ -1,0 +1,46 @@
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: scienceHub_app
+    ports:
+      - "9000:9000"
+    depends_on:
+      - db
+      - redis
+      - s3
+    env_file:
+      - .env
+  db:
+    image: postgres:latest
+    container_name: db
+    env_file:
+      - .env
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+    ports:
+      - "5432:5432"
+  redis:
+    image: redis:latest
+    container_name: redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - ./redis.conf:/usr/local/etc/redis/redis.conf
+    command: ["redis-server", "/usr/local/etc/redis/redis.conf"]
+  s3:
+    image: quay.io/minio/minio:latest
+    container_name: s3
+    ports:
+      - "9999:9999" #API
+      - "9990:9990" #web UI
+    env_file:
+      - .env
+    volumes:
+      - minio-data:/uploads
+    command: ["server", "/uploads", "--address", ":9999", "--console-address", ":9990"]
+volumes:
+  pgdata:
+  minio-data:

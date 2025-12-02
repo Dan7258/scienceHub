@@ -1,0 +1,400 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Вход</title>
+    <script src="https://yastatic.net/s3/passport-sdk/autofill/v1/sdk-suggest-with-polyfills-latest.js"></script>
+    <style>
+        body {
+            font-family: 'Segoe UI', Arial, sans-serif;
+            background-color: #f8f9fa;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            color: #2c3e50;
+        }
+        .login-container {
+            background-color: rgba(88, 130, 193, 0.15);
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            width: 380px;
+            max-width: 90%;
+            text-align: center;
+            backdrop-filter: blur(2px);
+            border: 1px solid rgba(88, 130, 193, 0.2);
+        }
+        .login-header {
+            margin-bottom: 30px;
+        }
+        .login-header h1 {
+            font-size: 28px;
+            font-weight: 600;
+            margin-bottom: 8px;
+            text-align: center;
+            color: #2c3e50;
+        }
+        .form-group {
+            margin-bottom: 20px;
+            text-align: left;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            font-size: 15px;
+            color: #2c3e50;
+            text-align: left;
+        }
+        .form-group input {
+            width: 100%;
+            max-width: 350px;
+            padding: 16px 15px;
+            border: 1px solid rgba(88, 130, 193, 0.3);
+            border-radius: 8px;
+            font-size: 16px;
+            transition: all 0.3s;
+            background-color: rgba(255, 255, 255, 0.8);
+            margin: 0 auto;
+            display: block;
+        }
+        .form-group input:focus {
+            outline: none;
+            border-color: #5882C1;
+            box-shadow: 0 0 0 2px rgba(88, 130, 193, 0.2);
+        }
+        .login-btn {
+            width: 100%;
+            max-width: 350px;
+            padding: 13px;
+            background-color: #4D38D7;
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            margin: 10px auto 0;
+            display: block;
+        }
+        .login-btn:hover {
+            background-color: #3A2AA3;
+        }
+        .register-link {
+            text-align: center;
+            margin-top: 25px;
+            font-size: 15px;
+            color: #2c3e50;
+        }
+        .register-link a {
+            color: #4D38D7;
+            text-decoration: none;
+            font-weight: 500;
+        }
+        .register-link a:hover {
+            text-decoration: underline;
+        }
+
+        .forgot-password-link {
+            text-align: center;
+            margin-top: 15px;
+            font-size: 15px;
+            color: #2c3e50;
+        }
+
+        .forgot-password-link a {
+            color: #4D38D7;
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .forgot-password-link a:hover {
+            text-decoration: underline;
+        }
+        .error {
+            color: #e74c3c;
+            font-size: 14px;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+        /* Стили для разделителя "или" */
+        .divider {
+            display: flex;
+            align-items: center;
+            margin: 20px 0;
+            color: #2c3e50;
+            font-size: 14px;
+        }
+        .divider::before,
+        .divider::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background-color: rgba(88, 130, 193, 0.3);
+            margin: 0 10px;
+        }
+        /* Контейнер для кнопки Яндекс */
+        #buttonContainerId {
+            display: flex;
+            justify-content: center;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+
+<body>
+{{template "header.html"}}
+<div class="login-container">
+    <div class="login-header">
+        <h1>Вход</h1>
+    </div>
+
+    <form id="loginForm">
+        <div class="form-group">
+            <label for="login">Логин (Email)</label>
+            <input type="text" id="login" name="login" placeholder="ваш email" required>
+        </div>
+
+        <div class="form-group">
+            <label for="password">Пароль</label>
+            <input type="password" id="password" name="password" placeholder="ваш пароль" required>
+        </div>
+
+        <button type="submit" class="login-btn">Войти</button>
+    </form>
+
+    <!-- Добавляем разделитель "или" -->
+    <div class="divider">или</div>
+
+    <!-- Контейнер для кнопки входа через Яндекс -->
+    <div id="buttonContainerId"></div>
+
+    <div style="margin-top: 15px">
+        <script src="https://unpkg.com/@vkid/sdk@<3.0.0/dist-sdk/umd/index.js"></script>
+        <script type="text/javascript">
+            if ('VKIDSDK' in window) {
+                const VKID = window.VKIDSDK;
+
+                VKID.Config.init({
+                    app: 53573299,
+                    redirectUrl: 'https://sciencehub.tech/profile',
+                    mode: VKID.ConfigAuthMode.InNewWindow,
+                    responseMode: VKID.ConfigResponseMode.Callback,
+                    source: VKID.ConfigSource.LOWCODE,
+                    scope: 'vkid.personal_info email', // Заполните нужными доступами по необходимости
+                });
+
+                const oneTap = new VKID.OneTap();
+
+                oneTap.render({
+                    container: document.currentScript.parentElement,
+                    showAlternativeLogin: true,
+                    styles: {
+                        width: 380,
+                        height: 44
+                    },
+                    oauthList: [
+                        'ok_ru',
+                        'mail_ru'
+                    ]
+                })
+                    .on(VKID.WidgetEvents.ERROR, vkidOnError)
+                    .on(VKID.OneTapInternalEvents.LOGIN_SUCCESS, function (payload) {
+                        const code = payload.code;
+                        const deviceId = payload.device_id;
+
+                        VKID.Auth.exchangeCode(code, deviceId)
+                            .then(vkidOnSuccess)
+                            .catch(vkidOnError);
+                    });
+
+                function vkidOnSuccess(data) {
+                    console.log(data)
+                    sendTokenToVK(data);
+                }
+
+                function vkidOnError(error) {
+                    // Обработка ошибки
+                }
+                function sendTokenToVK(data) {
+                    fetch('/token-vk', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({
+                            access_token: data.access_token,
+                            token_type: data.token_type,
+                            expires_in: data.expires_in,
+                            cid: data.cid
+                        })
+                    })
+                        .then(response => {
+                            if (!response.ok) {
+                                throw new Error('Network response was not ok');
+                            } else {
+                                window.location.href = '/profile';
+                            }
+                        })
+                        .catch(error => {
+                            console.error('Ошибка при отправке токена:', error);
+                            showError('Произошла ошибка при авторизации через VK ID');
+                        });
+                }
+            }
+        </script>
+    </div>
+
+    <div class="register-link">
+        Нет аккаунта? <a href="/register">Зарегистрироваться</a>
+    </div>
+    <div class="forgot-password-link">
+        <a href="/change-password">Забыли пароль?</a>
+    </div>
+
+    <div id="error-message" class="error-message" style="color: red; margin-top: 15px; display: none;"></div>
+</div>
+
+<script>
+    // Инициализация кнопки входа через Яндекс
+    window.onload = function () {
+        window.YaAuthSuggest.init(
+            {
+                client_id: "801ad42d7aba449dbe45f14ad76b3819",
+                response_type: "token",
+                redirect_uri: "https://sciencehub.tech/callback-ya"
+            },
+            "https://sciencehub.tech",
+            {
+                view: "button",
+                parentId: "buttonContainerId",
+                buttonSize: 'm',
+                buttonView: 'additional',
+                buttonTheme: 'dark',
+                buttonBorderRadius: "8",
+                buttonIcon: 'yaEng',
+            }
+        )
+            .then(({ handler }) => handler())
+            .then(data => {
+                console.log('Сообщение с токеном', data);
+                sendTokenToYA(data);
+            })
+            .catch(error => {
+                console.log('Обработка ошибки', error);
+                showError('Ошибка при входе через Яндекс');
+            });
+    };
+    function sendTokenToYA(data) {
+        fetch('/token-ya', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                access_token: data.access_token,
+                token_type: data.token_type,
+                expires_in: data.expires_in,
+                cid: data.cid
+            })
+        })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                } else {
+                    window.location.href = '/profile';
+                }
+            })
+
+    }
+
+
+    // Функции для работы меню
+    function toggleMenu() {
+        const menu = document.getElementById("menu");
+        const burger = document.querySelector(".burger-menu");
+        const body = document.body;
+
+        menu.classList.toggle("active");
+        burger.classList.toggle("active");
+
+        const isOpen = menu.classList.contains("active");
+
+        if (isOpen) {
+            const scrollBarWidth = window.innerWidth - document.documentElement.clientWidth;
+            body.style.overflow = "hidden";
+            body.style.paddingRight = scrollBarWidth + "px";
+        } else {
+            body.style.overflow = "";
+            body.style.paddingRight = "";
+        }
+    }
+
+    document.addEventListener('click', function(event) {
+        const menu = document.getElementById("menu");
+        const burger = document.querySelector(".burger-menu");
+        const body = document.body;
+
+        if (!menu.contains(event.target) && !event.target.closest('.burger-menu') && menu.classList.contains('active')) {
+            menu.classList.remove("active");
+            burger.classList.remove("active");
+            body.style.overflow = "";
+            body.style.paddingRight = "";
+        }
+    });
+
+    // Обработчик формы входа
+    document.getElementById('loginForm').addEventListener('submit', async function(e) {
+        e.preventDefault();
+
+        const login = document.getElementById('login').value;
+        const password = document.getElementById('password').value;
+        const errorElement = document.getElementById('error-message');
+
+        // Сброс предыдущих ошибок
+        errorElement.style.display = 'none';
+        errorElement.textContent = '';
+
+        if (!login || !password) {
+            showError('Пожалуйста, заполните все поля');
+            return;
+        }
+
+        try {
+            const response = await fetch('/login', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: `login=${encodeURIComponent(login)}&password=${encodeURIComponent(password)}`
+            });
+
+            if (response.redirected) {
+                // Перенаправление при успешном входе
+                window.location.href = response.url;
+            } else if (response.status === 401) {
+                showError('Неверный логин или пароль');
+            } else if (response.status === 500) {
+                showError('Ошибка сервера. Пожалуйста, попробуйте позже');
+            } else {
+                const result = await response.text();
+                showError(result || 'Произошла неизвестная ошибка');
+            }
+        } catch (error) {
+            console.error('Ошибка:', error);
+            showError('Произошла ошибка при подключении к серверу');
+        }
+    });
+
+    function showError(message) {
+        const errorElement = document.getElementById('error-message');
+        errorElement.textContent = message;
+        errorElement.style.display = 'block';
+    }
+</script>
+</body>
+</html>

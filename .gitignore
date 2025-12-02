@@ -1,0 +1,10 @@
+test-results/
+tmp/
+routes/
+*.idea/
+.env
+public/uploads/*.pdf
+
+.exe
+
+redis.conf

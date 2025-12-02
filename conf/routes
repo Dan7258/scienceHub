@@ -1,0 +1,148 @@
+# Routes Config
+#
+# This file defines all application routes (Higher priority routes first)
+#
+
+module:testrunner
+# module:jobs
+
+# ===== Управление тегами =====
+# получение тега по ID
+GET     /tags/id/:id                            Tags.GetTagByID
+# получение тега по названию
+GET     /tags/name/:name                        Tags.GetTagByName
+# получение всех тегов
+GET     /tags                                   Tags.GetAllTags
+# создание нового тега
+POST    /tags                                   Tags.CreateTag
+# добавление публикаций к тегу
+POST    /tags/:id/publications                  Tags.AddPublicationsToTag
+# удаление тега по названию
+DELETE  /tags/name/:name                        Tags.DeleteTagByName
+# удаление публикаций из тега
+DELETE  /tags/:id/publications                  Tags.DeletePublicationsFromTag
+# обновление тега по названию
+PATCH   /tags/name/:name                        Tags.UpdateTagByName
+
+# ===== Управление научными публикациями =====
+# отображение списка публикаций (главная страница)
+GET     /                                       Publications.ShowPublications
+# получение данных всех публикаций
+GET     /getPublicationsData                    Publications.GetPublicationsData
+# отображение страницы создания публикации
+GET     /create-publication                     Publications.ShowCreatePublicationPage
+# отображение страницы редактирования публикации
+GET     /update-publication                     Publications.ShowUpdatePublicationPage
+# получение данных публикации по ID для редактирования
+GET     /update-publication/:id                 Publications.GetPublicationData
+# получение публикаций с пагинацией
+POST    /get-publications-paginator             Publications.GetPublicationsPaginator
+# экспорт списка публикаций в файл
+POST    /get-file-with-publication-list         Publications.GetFileWithPublicationList
+# создание новой публикации
+POST    /create-publication                     Publications.CreatePublication
+# удаление публикации
+DELETE  /delete-publication                     Publications.DeletePublication
+# удаление автора из публикации
+DELETE  /publications/delete-author             Publications.DeleteAuthorFromPublication
+# обновление данных публикации
+PATCH   /update-publication                     Publications.UpdatePublication
+
+# ===== Аутентификация и управление профилями =====
+# отображение профиля пользователя по ID
+GET     /user-profile/:id                       Profiles.ShowUserProfilePageByID
+# получение данных профиля по ID
+GET     /profiles/id/:id                        Profiles.GetProfileByID
+# получение данных текущего пользователя
+GET     /getUserData                            Profiles.GetUserData
+# получение ID и имен всех пользователей (для создания публикации)
+GET     /get-all-user-id-and-names              Profiles.GetUsersDataForCreatePublication
+# отображение страницы профиля текущего пользователя
+GET     /profile                                Profiles.ShowUserProfile
+# отображение страницы авторизации
+GET     /login                                  Profiles.ShowLoginPage
+# выход из системы и удаление сессии
+GET     /logout                                 Profiles.Logout
+# отображение страницы регистрации
+GET     /register                               Profiles.ShowRegisterPage
+# отображение страницы смены пароля
+GET     /change-password                        Profiles.ShowChangePasswordPage
+# авторизация пользователя с помощью логина и пароля
+POST    /login                                  Profiles.Login
+# создание пользователя после верификации
+POST    /register                               Profiles.VerifyAndCreateUser
+# отправка кода подтверждения на email при регистрации
+POST    /send-verification-code-for-register    Profiles.SendVerificationCodeForRegister
+# отправка кода подтверждения для смены email
+POST    /send-verification-code-for-change-email Profiles.SendVerificationCodeForChangeEmail
+# отправка кода подтверждения для смены пароля
+POST    /send-verification-code-for-change-password Profiles.SendVerificationCodeForChangePassword
+# проверка кода и смена email
+POST    /settings/verify-and-change-email       Profiles.VerifyAndChangeEmail
+# проверка кода и смена пароля
+POST    /settings/verify-and-change-password    Profiles.VerifyAndChangePassword
+# проверка кода и смена забытого пароля
+POST    /verify-and-change-forget-password    Profiles.VerifyAndChangeForgetPassword
+# отмена процесса смены email
+POST    /settings/stop-change-email             Profiles.StopChangeEmail
+# отмена процесса смены пароля
+POST    /settings/stop-change-password          Profiles.StopChangePassword
+# отображение страницы настроек профиля
+GET     /settings                               Profiles.ShowSettingsPage
+# подписка на профиль по ID
+POST    /subscribe/:id                          Profiles.AddSubscriberToProfile
+# удаление профиля текущего пользователя
+DELETE  /profiles/:id                           Profiles.DeleteProfileByID
+# отписка от профиля по ID
+DELETE  /unsubscribe/:id                        Profiles.DeleteSubscriberFromProfile
+# обновление данных профиля пользователя
+PATCH   /profiles                               Profiles.UpdateProfileByID
+
+# ===== Социальные элементы и взаимодействие пользователей =====
+# отображение страницы со списком авторов
+GET     /authors                                Profiles.ShowAuthorsPage
+# отображение страницы с подписчиками текущего пользователя
+GET     /subscribers                            Profiles.ShowMySubscribers
+# отображение страницы с подписками текущего пользователя
+GET     /subscribes                             Profiles.ShowMySubscribes
+# получение списка авторов с пагинацией
+POST    /get-authors-paginator                  Profiles.GetAuthorsPaginator
+# получение списка подписчиков с пагинацией
+POST    /get-subscribers-paginator              Profiles.GetMySubscribersPaginator
+# получение списка подписок с пагинацией
+POST    /get-subscribes-paginator               Profiles.GetMySubscribesPaginator
+
+# ===== Административные функции =====
+# отображение административной панели
+GET     /admin                                  Admins.ShowAdminPage
+# отображение страницы входа для администраторов
+GET     /login-admin                            Admins.ShowLoginAdminPage
+# авторизация администратора
+POST    /login-admin                            Admins.LoginAdmin
+# выход из административной панели
+GET     /logout-admin                           Admins.LogoutAdmin
+
+# ===== Интеграция с внешними авторизационными сервисами =====
+# обработка callback при авторизации через Яндекс
+GET     /callback-ya                            OpenID.ShowCallbackYAPage
+# обработка токена аутентификации Яндекса
+POST    /token-ya                               OpenID.GetCodeForYAToken
+# обработка токена аутентификации ВКонтакте
+POST    /token-vk                               OpenID.GetCodeForVKToken
+
+# ===== Системные маршруты =====
+# Ignore favicon requests
+GET     /favicon.ico                            404
+
+# Map static resources from the /app/public folder to the /public path
+GET     /public/*filepath                       Static.Serve("public")
+
+# Catch all, this will route any request into the controller path
+#
+#                    **** WARNING ****
+# Enabling this exposes any controller and function to the web.
+# ** This is a serious security issue if used online **
+#
+# For rapid development uncomment the following to add new controller.action endpoints
+# without having to add them to the routes table.
+# *       /:controller/:action                    :controller.:action

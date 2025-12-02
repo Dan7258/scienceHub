@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Panel</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100">
+<!-- Header -->
+<header class="bg-blue-600 text-white p-4 shadow-md">
+    <div class="container mx-auto flex justify-between items-center">
+        <h1 class="text-2xl font-bold">Admin Panel</h1>
+        <a href="/logout-admin" class="bg-red-500 hover:bg-red-600 text-white font-semibold py-2 px-4 rounded">
+            Logout
+        </a>
+    </div>
+</header>
+
+<!-- Main Content -->
+<main class="container mx-auto mt-8 p-4">
+    <!-- Form: Add Tag -->
+    <section class="bg-white p-6 rounded-lg shadow-md mb-8">
+        <h2 class="text-xl font-semibold mb-4">Add New Tag</h2>
+        <form id="addTagForm" class="space-y-6">
+            <div>
+                <label for="tagName" class="block text-base font-semibold text-gray-800">Tag Name</label>
+                <input type="text" id="tagName" name="name" required
+                       class="mt-1 block w-full border-2 border-gray-400 rounded-md shadow-sm bg-gray-50 text-base py-2 px-3 focus:ring-2 focus:ring-blue-600 focus:border-blue-600 hover:border-gray-500"
+                       placeholder="Enter tag name">
+            </div>
+            <button type="submit"
+                    class="bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-4 rounded">
+                Add Tag
+            </button>
+        </form>
+    </section>
+
+    <!-- Form: Update Tag -->
+    <section class="bg-white p-6 rounded-lg shadow-md mb-8">
+        <h2 class="text-xl font-semibold mb-4">Update Tag</h2>
+        <form id="updateTagForm" class="space-y-6">
+            <div>
+                <label for="oldTagName" class="block text-base font-semibold text-gray-800">Old Tag Name</label>
+                <input type="text" id="oldTagName" name="oldName" required
+                       class="mt-1 block w-full border-2 border-gray-400 rounded-md shadow-sm bg-gray-50 text-base py-2 px-3 focus:ring-2 focus:ring-blue-600 focus:border-blue-600 hover:border-gray-500"
+                       placeholder="Enter current tag name">
+            </div>
+            <div>
+                <label for="newTagName" class="block text-base font-semibold text-gray-800">New Tag Name</label>
+                <input type="text" id="newTagName" name="newName" required
+                       class="mt-1 block w-full border-2 border-gray-400 rounded-md shadow-sm bg-gray-50 text-base py-2 px-3 focus:ring-2 focus:ring-blue-600 focus:border-blue-600 hover:border-gray-500"
+                       placeholder="Enter new tag name">
+            </div>
+            <button type="submit"
+                    class="bg-green-500 hover:bg-green-600 text-white font-semibold py-2 px-4 rounded">
+                Update Tag
+            </button>
+        </form>
+    </section>
+
+    <!-- Form: Delete Tag -->
+    <section class="bg-white p-6 rounded-lg shadow-md">
+        <h2 class="text-xl font-semibold mb-4">Delete Tag</h2>
+        <form id="deleteTagForm" class="space-y-6">
+            <div>
+                <label for="deleteTagName" class="block text-base font-semibold text-gray-800">Tag Name</label>
+                <input type="text" id="deleteTagName" name="name" required
+                       class="mt-1 block w-full border-2 border-gray-400 rounded-md shadow-sm bg-gray-50 text-base py-2 px-3 focus:ring-2 focus:ring-blue-600 focus:border-blue-600 hover:border-gray-500"
+                       placeholder="Enter tag name to delete">
+            </div>
+            <button type="submit"
+                    class="bg-red-500 hover:bg-red-600 text-white font-semibold py-2 px-4 rounded">
+                Delete Tag
+            </button>
+        </form>
+    </section>
+
+    <!-- Form: Delete User -->
+    <section class="bg-white p-6 rounded-lg shadow-md mt-8">
+        <h2 class="text-xl font-semibold mb-4">Удалить пользователя</h2>
+        <form id="deleteUserForm" class="space-y-6">
+            <div>
+                <label for="userId" class="block text-base font-semibold text-gray-800">ID пользователя</label>
+                <input type="text" id="userId" name="id" required
+                       class="mt-1 block w-full border-2 border-gray-400 rounded-md shadow-sm bg-gray-50 text-base py-2 px-3 focus:ring-2 focus:ring-red-600 focus:border-red-600 hover:border-gray-500"
+                       placeholder="Введите ID пользователя для удаления">
+            </div>
+            <button type="submit"
+                    class="bg-red-600 hover:bg-red-700 text-white font-semibold py-2 px-4 rounded">
+                Удалить пользователя
+            </button>
+        </form>
+    </section>
+
+    <!-- Form: Edit Publication -->
+    <section class="bg-white p-6 rounded-lg shadow-md mt-8">
+        <h2 class="text-xl font-semibold mb-4">Редактировать публикацию</h2>
+        <form id="editPublicationForm" class="space-y-6">
+            <div>
+                <label for="publicationId" class="block text-base font-semibold text-gray-800">ID публикации</label>
+                <input type="number" id="publicationId" name="id" required
+                       class="mt-1 block w-full border-2 border-gray-400 rounded-md shadow-sm bg-gray-50 text-base py-2 px-3 focus:ring-2 focus:ring-yellow-600 focus:border-yellow-600 hover:border-gray-500"
+                       placeholder="Введите ID публикации для редактирования">
+            </div>
+            <button type="submit"
+                    class="bg-yellow-500 hover:bg-yellow-600 text-white font-semibold py-2 px-4 rounded">
+                Перейти к редактированию
+            </button>
+        </form>
+    </section>
+</main>
+
+<!-- JavaScript for Form Submission -->
+<script>
+    // Add Tag Form Submission
+    document.getElementById('addTagForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const formData = new FormData(e.target);
+        const tagData = {
+            name: formData.get('name')
+        };
+
+        try {
+            const response = await fetch('/tags', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(tagData)
+            });
+
+            if (response.ok) {
+                alert('Tag added successfully!');
+                e.target.reset();
+            } else {
+                const error = await response.json();
+                alert('Error adding tag: ' + (error.message || 'Unknown error'));
+            }
+        } catch (error) {
+            alert('Network error: ' + error.message);
+        }
+    });
+
+    // Update Tag Form Submission
+    document.getElementById('updateTagForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const formData = new FormData(e.target);
+        const oldName = formData.get('oldName');
+        const tagData = {
+            name: formData.get('newName')
+        };
+
+        try {
+            const response = await fetch(`/tags/name/${encodeURIComponent(oldName)}`, {
+                method: 'PATCH',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(tagData)
+            });
+
+            if (response.ok) {
+                alert('Tag updated successfully!');
+                e.target.reset();
+            } else {
+                const error = await response.json();
+                alert('Error updating tag: ' + (error.message || 'Unknown error'));
+            }
+        } catch (error) {
+            alert('Network error: ' + error.message);
+        }
+    });
+
+    // Delete Tag Form Submission
+    document.getElementById('deleteTagForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const formData = new FormData(e.target);
+        const tagName = formData.get('name');
+
+        try {
+            const response = await fetch(`/tags/name/${encodeURIComponent(tagName)}`, {
+                method: 'DELETE',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            });
+
+            if (response.ok) {
+                alert('Tag deleted successfully!');
+                e.target.reset();
+            } else {
+                const error = await response.json();
+                alert('Error deleting tag: ' + (error.message || 'Unknown error'));
+            }
+        } catch (error) {
+            alert('Network error: ' + error.message);
+        }
+    });
+
+    // Delete User Form Submission
+    document.getElementById('deleteUserForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const formData = new FormData(e.target);
+        const userId = formData.get('id');
+
+        const confirmed = confirm(`Вы уверены, что хотите удалить пользователя с ID ${userId}? Это действие необратимо.`);
+        if (!confirmed) return;
+
+        try {
+            const response = await fetch(`/profiles/${encodeURIComponent(userId)}`, {
+                method: 'DELETE',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            });
+
+            if (response.ok) {
+                alert('Пользователь успешно удалён!');
+                e.target.reset();
+            } else {
+                const error = await response.json();
+                alert('Ошибка при удалении пользователя: ' + (error.message || 'Неизвестная ошибка'));
+            }
+        } catch (error) {
+            alert('Сетевая ошибка: ' + error.message);
+        }
+    });
+
+    // Edit Publication Form Submission
+    document.getElementById('editPublicationForm').addEventListener('submit', (e) => {
+        e.preventDefault();
+        const formData = new FormData(e.target);
+        const publicationId = formData.get('id');
+
+        if (!publicationId) {
+            alert('Введите корректный ID публикации');
+            return;
+        }
+
+        window.location.href = `/update-publication?id=${encodeURIComponent(publicationId)}`;
+    });
+</script>
+</body>
+</html>

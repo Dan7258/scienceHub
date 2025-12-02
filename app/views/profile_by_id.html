@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <base href="https://sciencehub.tech/">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet"/>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+    <title>Профиль пользователя</title>
+    <style>
+        :root {
+            --bg-color: #f9fafb;
+            --primary: #2563eb;
+            --secondary: #6b7280;
+            --accent: #10b981;
+            --card-bg: #ffffff;
+            --border-color: #e5e7eb;
+            --text-color: #333;
+            --light-bg: #f4f7fa;
+            --error-color: #e74c3c;
+            --muted-text: #7f8c8d;
+        }
+
+        body {
+            margin: 0;
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-color);
+            color: #111827;
+        }
+
+        .container {
+            max-width: 1100px;
+            margin: 60px auto;
+            padding: 20px;
+        }
+
+        .profile-card {
+            background: var(--card-bg);
+            border-radius: 12px;
+            padding: 30px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.06);
+            display: flex;
+            gap: 20px;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+
+        .profile-card img {
+            width: 100px;
+            height: 100px;
+            border-radius: 100%;
+            background: #d1d5db;
+        }
+
+        .profile-details h2 {
+            margin: 0;
+            font-size: 1.5em;
+        }
+
+        .profile-details p {
+            margin: 4px 0;
+            color: var(--secondary);
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 10px;
+            margin: 20px 0;
+        }
+
+        .action-buttons button {
+            background-color: #4D38D7;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            padding: 10px 18px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .action-buttons button:hover {
+            background-color: #3A2AA3;
+        }
+
+        .main-content {
+            background: var(--card-bg);
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.04);
+        }
+
+        .main-content h2 {
+            margin-top: 0;
+            font-size: 1.25em;
+        }
+
+        .publication {
+            background-color: #f9fafb;
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 15px;
+        }
+
+        .publication h3 {
+            margin: 0 0 10px 0;
+            font-size: 1.1em;
+        }
+
+        .publication p {
+            margin: 5px 0;
+            font-size: 0.95em;
+        }
+
+        .profiles {
+            margin-top: 0.75rem;
+        }
+
+        .profiles a {
+            display: inline-block;
+            background: #5882C1;
+            color: white;
+            padding: 0.35rem 0.75rem;
+            border-radius: 4px;
+            font-size: 0.875rem;
+            text-decoration: none;
+            transition: all 0.2s ease;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            border: 1px solid #5882C1;
+            margin-right: 0.5rem;
+            margin-top: 0.25rem;
+        }
+
+        .profiles a:hover {
+            background: #1d4ed8;
+            transform: translateY(-1px);
+            box-shadow: 0 2px 5px rgba(0,0,0,0.15);
+        }
+
+        .tags {
+            margin-top: 0.75rem;
+        }
+
+        .tags span {
+            display: inline-block;
+            color: #3178c6;
+            background-color: #f0f6ff;
+            padding: 0.1rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.875rem;
+            margin-right: 0.5rem;
+            margin-top: 0.25rem;
+            border: none;
+        }
+
+        .error {
+            color: var(--error-color);
+            font-style: italic;
+            margin-top: 20px;
+            text-align: center;
+        }
+
+        @media (max-width: 768px) {
+            .profile-card {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+        }
+    </style>
+</head>
+<body data-user-id="{{.id}}">
+{{template "header.html"}}
+<div class="container">
+    <div class="profile-card">
+        <div class="profile-details">
+            <h2><span id="last_name"></span> <span id="first_name"></span> <span id="middle_name"></span></h2>
+            <p>ID: <strong id="user_id"></strong></p>
+            <p>Ученая степень: <span id="academic_degree"></span></p>
+            <p>VAC: <span id="vac"></span></p>
+            <p>Должность: <span id="appointment"></span></p>
+            <p>Страна: <span id="country"></span></p>
+            <p>Подписчики: <span id="subscribers_count"></span> | Подписки: <span id="subscriptions_count"></span></p>
+        </div>
+    </div>
+
+    <div class="action-buttons">
+        <button id="subscribe_btn"><i class="fas fa-user-plus"></i> Подписаться</button>
+        <button id="unsubscribe_btn" style="display:none;"><i class="fas fa-user-minus"></i> Отписаться</button>
+    </div>
+
+    <div class="main-content">
+        <h2>Публикации</h2>
+        <div id="publications">Загрузка...</div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        const profileId = document.body.getAttribute("data-user-id");
+
+        fetch(`/profiles/id/${profileId}`, { credentials: 'include' })
+            .then(res => {
+                if (res.status === 401) {
+                    window.location.href = '/login';
+                    return Promise.reject('Unauthorized');
+                }
+                if (!res.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return res.json();
+            })
+            .then(data => {
+                document.getElementById('user_id').innerText = data.Profile.id;
+                document.getElementById('first_name').innerText = data.Profile.first_name;
+                document.getElementById('last_name').innerText = data.Profile.last_name;
+                document.getElementById('middle_name').innerText = data.Profile.middle_name;
+                document.getElementById('country').innerText = data.Profile.country || 'Не указана';
+                document.getElementById('academic_degree').innerText = data.Profile.academic_degree || 'Не указана';
+                document.getElementById('vac').innerText = data.Profile.vac || 'Не указан';
+                document.getElementById('appointment').innerText = data.Profile.appointment || 'Не указано';
+                document.getElementById('subscribers_count').innerText = data.Profile.SubscribersList?.length || 0;
+                document.getElementById('subscriptions_count').innerText = data.Profile.MySubscribesList?.length || 0;
+
+                const publicationsDiv = document.getElementById("publications");
+                publicationsDiv.innerHTML = '';
+
+                if (data.Profile.Publications && data.Profile.Publications.length > 0) {
+                    data.Profile.Publications.forEach(pub => {
+                        const pubDiv = document.createElement("div");
+                        pubDiv.className = "publication";
+                        pubDiv.innerHTML = `
+                            <h3>${pub.title || 'Без названия'}</h3>
+                            <p><strong>Аннотация:</strong> ${pub.abstract || 'Нет аннотации'}</p>
+                            <p><strong>Создано:</strong> ${new Date(pub.created_at).toLocaleDateString()}</p>
+                            <p><strong>Обновлено:</strong> ${new Date(pub.updated_at).toLocaleDateString()}</p>
+                        `;
+
+                        // Авторы
+                        const profilesDiv = document.createElement('div');
+                        profilesDiv.className = 'profiles';
+                        profilesDiv.innerHTML = '<strong>Авторы:</strong> ';
+                        if (pub.profiles && pub.profiles.length > 0) {
+                            pub.profiles.forEach(profile => {
+                                const link = document.createElement('a');
+                                link.href = `/user-profile/${profile.id}`;
+                                link.innerText = `${profile.first_name || ''} ${profile.last_name || ''}`.trim() || 'Неизвестный автор';
+                                profilesDiv.appendChild(link);
+                            });
+                        } else {
+                            profilesDiv.innerHTML += 'Авторы не указаны';
+                        }
+                        pubDiv.appendChild(profilesDiv);
+
+                        // Теги
+                        const tagsDiv = document.createElement('div');
+                        tagsDiv.className = 'tags';
+                        tagsDiv.innerHTML = '<strong>Теги:</strong> ';
+                        if (pub.tags && pub.tags.length > 0) {
+                            pub.tags.forEach(tag => {
+                                const span = document.createElement('span');
+                                span.innerText = tag.name || 'Без названия';
+                                tagsDiv.appendChild(span);
+                            });
+                        } else {
+                            tagsDiv.innerHTML += 'Теги не указаны';
+                        }
+                        pubDiv.appendChild(tagsDiv);
+
+                        // Ссылка для скачивания файла
+                        if (pub.file_link) {
+                            const downloadLink = document.createElement('a');
+                            downloadLink.href = pub.file_link.replace('/user-profile', '');
+                            downloadLink.target = '_blank';
+                            downloadLink.style.marginTop = '10px';
+                            downloadLink.style.display = 'inline-block';
+                            downloadLink.style.color = '#4D38D7';
+                            downloadLink.style.textDecoration = 'none';
+                            downloadLink.style.marginRight = '15px';
+                            downloadLink.innerHTML = '📄 Скачать статью (PDF)';
+                            pubDiv.appendChild(downloadLink);
+                        }
+
+                        publicationsDiv.appendChild(pubDiv);
+                    });
+                } else {
+                    publicationsDiv.innerText = 'Публикаций нет';
+                }
+
+                // Логика подписки/отписки
+                if (data.Isubscribed) {
+                    document.getElementById('subscribe_btn').style.display = 'none';
+                    document.getElementById('unsubscribe_btn').style.display = 'inline-flex';
+                } else {
+                    document.getElementById('subscribe_btn').style.display = 'inline-flex';
+                    document.getElementById('unsubscribe_btn').style.display = 'none';
+                }
+            })
+            .catch(error => {
+                console.error("Ошибка загрузки профиля:", error);
+                document.getElementById("publications").innerHTML = '<p class="error">Ошибка загрузки данных профиля</p>';
+            });
+
+        // Обработчик кнопки "Подписаться"
+        document.getElementById('subscribe_btn').addEventListener('click', function () {
+            fetch(`/subscribe/${profileId}`, { method: 'POST', credentials: 'include' })
+                .then(res => {
+                    if (res.ok) {
+                        document.getElementById('subscribe_btn').style.display = 'none';
+                        document.getElementById('unsubscribe_btn').style.display = 'inline-flex';
+                        const count = document.getElementById('subscribers_count');
+                        count.innerText = parseInt(count.innerText) + 1;
+                    } else {
+                        alert('Ошибка при подписке');
+                    }
+                })
+                .catch(err => alert("Ошибка при подписке"));
+        });
+
+        // Обработчик кнопки "Отписаться"
+        document.getElementById('unsubscribe_btn').addEventListener('click', function () {
+            fetch(`/unsubscribe/${profileId}`, { method: 'DELETE', credentials: 'include' })
+                .then(res => {
+                    if (res.ok) {
+                        document.getElementById('subscribe_btn').style.display = 'inline-flex';
+                        document.getElementById('unsubscribe_btn').style.display = 'none';
+                        const count = document.getElementById('subscribers_count');
+                        count.innerText = parseInt(count.innerText) - 1;
+                    } else {
+                        alert('Ошибка при отписке');
+                    }
+                })
+                .catch(err => alert("Ошибка при отписке"));
+        });
+    });
+</script>
+</body>
+</html>

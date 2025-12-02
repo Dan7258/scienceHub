@@ -1,0 +1,473 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Авторы</title>
+    <style>
+        :root {
+            --primary-color: #3498db;
+            --secondary-color: #2c3e50;
+            --text-color: #333;
+            --light-bg: #f4f7fa;
+            --card-bg: #fff;
+            --error-color: #e74c3c;
+            --muted-text: #7f8c8d;
+            --border-color: #e5e7eb;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            background-color: var(--light-bg);
+            margin: 0;
+            padding: 0;
+            color: var(--text-color);
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: min(1200px, 95%);
+            margin: 80px auto 20px auto;
+            padding: 1.5rem;
+            background: var(--card-bg);
+            border-radius: 10px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            color: var(--secondary-color);
+            border-bottom: 2px solid #5882C1;
+            padding-bottom: 0.5rem;
+            margin-bottom: 1.5rem;
+            font-size: clamp(1.5rem, 4vw, 1.8rem);
+        }
+
+        .search-bar {
+            margin-bottom: 1.5rem;
+            display: flex;
+            gap: 0.75rem;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .search-bar input {
+            flex: 1;
+            min-width: 200px;
+            padding: 0.75rem;
+            font-size: 1rem;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            outline: none;
+            transition: border-color 0.2s ease;
+        }
+
+        .search-bar input:focus {
+            border-color: var(--primary-color);
+        }
+
+        .search-bar select {
+            padding: 0.75rem;
+            font-size: 1rem;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            outline: none;
+            transition: border-color 0.2s ease;
+            background: white;
+        }
+
+        .search-bar select:focus {
+            border-color: var(--primary-color);
+        }
+
+        .search-bar button {
+            padding: 0.75rem 1.5rem;
+            background: var(--error-color);
+            color: white;
+            border: none;
+            border-radius: 4px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+            white-space: nowrap;
+        }
+
+        .search-bar button:hover {
+            background: #c0392b;
+        }
+
+        .author-card {
+            background: #f9fafb;
+            padding: 1.25rem;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+            margin-bottom: 1.25rem;
+            border: 1px solid var(--border-color);
+        }
+
+        .author-card h2 {
+            margin: 0 0 0.75rem;
+            font-size: clamp(1rem, 3vw, 1.2rem);
+            font-weight: 600;
+        }
+
+        .author-card p {
+            font-size: clamp(0.85rem, 2.5vw, 0.95rem);
+            margin: 0.4rem 0;
+        }
+
+        .author-card a {
+            display: inline-block;
+            margin-top: 0.75rem;
+            color: #4D38D7;
+            text-decoration: none;
+            font-weight: 500;
+            font-size: clamp(0.9rem, 2.5vw, 1rem);
+        }
+
+        .author-card a:hover {
+            text-decoration: underline;
+        }
+
+        .loading {
+            color: var(--muted-text);
+            font-style: italic;
+            text-align: center;
+            padding: 1.5rem;
+            font-size: clamp(0.9rem, 3vw, 1rem);
+        }
+
+        .error-message {
+            color: var(--error-color);
+            text-align: center;
+            padding: 1.5rem;
+            font-size: clamp(0.9rem, 3vw, 1rem);
+        }
+
+        .skeleton {
+            animation: pulse 1.5s infinite ease-in-out;
+            background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+            background-size: 200% 100%;
+            border-radius: 4px;
+            margin-bottom: 1rem;
+            height: 1.5rem;
+        }
+
+        @keyframes pulse {
+            0% { background-position: 200% 0; }
+            100% { background-position: -200% 0; }
+        }
+
+        .pagination-controls {
+            text-align: center;
+            margin-top: 2rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 1rem;
+        }
+
+        .pagination-controls button {
+            padding: 0.75rem 1.5rem;
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 4px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+        }
+
+        .pagination-controls button:hover {
+            background: #2980b9;
+        }
+
+        .pagination-controls button:disabled {
+            background: var(--muted-text);
+            cursor: not-allowed;
+        }
+
+        .page-info {
+            font-size: 1rem;
+            color: var(--text-color);
+            margin: 0 1rem;
+            min-width: 120px;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 1rem;
+            }
+
+            .search-bar {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .search-bar input, .search-bar select, .search-bar button {
+                min-width: 100%;
+                width: 100%;
+                padding: 0.75rem;
+            }
+
+            .pagination-controls {
+                flex-direction: column;
+                gap: 0.5rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            h1 {
+                font-size: clamp(1.2rem, 5vw, 1.5rem);
+            }
+
+            .author-card h2 {
+                font-size: clamp(0.9rem, 4vw, 1rem);
+            }
+
+            .author-card p {
+                font-size: clamp(0.75rem, 3vw, 0.85rem);
+            }
+
+            .author-card a {
+                font-size: clamp(0.8rem, 3vw, 0.9rem);
+            }
+        }
+    </style>
+</head>
+<body>
+{{template "header.html"}}
+<div class="container">
+    <h1>Авторы</h1>
+    <div class="search-bar">
+        <input type="text" id="search-input" placeholder="Поиск по ID или ФИО">
+        <select id="sortSelect">
+            <option value="2" selected>По имени (А-Я)</option>
+            <option value="3">По имени (Я-А)</option>
+            <option value="1">По дате (новые)</option>
+            <option value="0">По дате (старые)</option>
+        </select>
+        <select id="countSelect">
+            <option value="5">5 на странице</option>
+            <option value="10" selected>10 на странице</option>
+            <option value="15">15 на странице</option>
+            <option value="20">20 на странице</option>
+        </select>
+        <button onclick="resetAll()">Сбросить всё</button>
+    </div>
+    <div id="authors">
+        <div class="skeleton" style="width: 80%;"></div>
+        <div class="skeleton" style="width: 60%;"></div>
+        <div class="skeleton" style="width: 70%; height: 100px;"></div>
+        <div class="skeleton" style="width: 50%;"></div>
+    </div>
+    <div class="pagination-controls">
+        <button id="prevPage" onclick="loadPreviousPage()" disabled>← Назад</button>
+        <span id="pageInfo" class="page-info">Страница 1 из 1</span>
+        <button id="nextPage" onclick="loadNextPage()" disabled>Вперёд →</button>
+    </div>
+</div>
+
+<script>
+    let allAuthors = [];
+    let searchTimeout;
+    let searchData = {
+        stroke: "",
+        page: 1,
+        count: 10,
+        sort: 2  // SortNameAsc - по умолчанию по имени А-Я
+    };
+    let maxPages = 1;
+
+    document.addEventListener("DOMContentLoaded", function() {
+        setTimeout(() => loadAuthors(), 300);
+
+        document.getElementById('search-input').addEventListener('input', handleSearchInput);
+
+        document.getElementById('sortSelect').addEventListener('change', function(e) {
+            searchData.sort = parseInt(e.target.value);
+            searchData.page = 1;
+            loadAuthors();
+        });
+
+        document.getElementById('countSelect').addEventListener('change', function(e) {
+            searchData.count = parseInt(e.target.value);
+            searchData.page = 1;
+            loadAuthors();
+        });
+    });
+
+    function handleSearchInput() {
+        clearTimeout(searchTimeout);
+        searchTimeout = setTimeout(searchAuthors, 500);
+    }
+
+    function loadAuthors() {
+        const authorsContainer = document.getElementById('authors');
+        const prevButton = document.getElementById('prevPage');
+        const nextButton = document.getElementById('nextPage');
+        const pageInfo = document.getElementById('pageInfo');
+
+        authorsContainer.innerHTML = `
+            <div class="skeleton" style="width: 80%;"></div>
+            <div class="skeleton" style="width: 60%;"></div>
+            <div class="skeleton" style="width: 70%; height: 100px;"></div>
+            <div class="skeleton" style="width: 50%;"></div>
+        `;
+
+        fetch('/get-authors-paginator', {
+            method: 'POST',
+            credentials: 'include',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+                'Cache-Control': 'no-cache'
+            },
+            body: JSON.stringify(searchData)
+        })
+            .then(async response => {
+                if (response.status === 401) {
+                    if (!window.location.pathname.includes('/login')) {
+                        window.location.href = '/login';
+                    }
+                    return;
+                }
+
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+
+                const responseData = await response.json();
+                console.log('Loaded authors:', responseData);
+
+                allAuthors = responseData.data || [];
+                maxPages = responseData.max_pages || 1;
+
+                renderAuthors(allAuthors);
+                updatePaginationControls();
+            })
+            .catch(error => {
+                console.error('Ошибка при получении авторов:', error);
+                showError();
+            });
+    }
+
+    function updatePaginationControls() {
+        const prevButton = document.getElementById('prevPage');
+        const nextButton = document.getElementById('nextPage');
+        const pageInfo = document.getElementById('pageInfo');
+
+        pageInfo.textContent = `Страница ${searchData.page} из ${maxPages}`;
+        prevButton.disabled = searchData.page <= 1;
+        nextButton.disabled = searchData.page >= maxPages;
+    }
+
+    function loadNextPage() {
+        if (searchData.page < maxPages) {
+            searchData.page++;
+            loadAuthors();
+        }
+    }
+
+    function loadPreviousPage() {
+        if (searchData.page > 1) {
+            searchData.page--;
+            loadAuthors();
+        }
+    }
+
+    function renderAuthors(authors) {
+        const authorsContainer = document.getElementById('authors');
+
+        if (!authors || authors.length === 0) {
+            authorsContainer.innerHTML = '<p class="loading">Авторов нет</p>';
+            return;
+        }
+
+        const fragment = document.createDocumentFragment();
+
+        authors.forEach(author => {
+            const div = document.createElement('div');
+            div.className = 'author-card';
+
+            div.innerHTML = `
+                <h2>${escapeHtml(`${author.last_name || ''} ${author.first_name || ''} ${author.middle_name || ''}`.trim()) || 'Без имени'}</h2>
+                <p><strong>ID:</strong> ${escapeHtml(author.id || 'Не указан')}</p>
+                <p><strong>Ученая степень:</strong> ${escapeHtml(author.academic_degree || 'Не указана')}</p>
+                <p><strong>VAC:</strong> ${escapeHtml(author.vac || 'Не указан')}</p>
+                <p><strong>Должность:</strong> ${escapeHtml(author.appointment || 'Не указана')}</p>
+                <p><strong>Страна:</strong> ${escapeHtml(author.country || 'Не указана')}</p>
+                <p><strong>Подписчики:</strong> ${author.SubscribersList ? author.SubscribersList.length : 0}</p>
+                <p><strong>Публикации:</strong> ${author.Publications ? author.Publications.length : 0}</p>
+                <a href="/user-profile/${escapeHtml(author.id)}">Посмотреть профиль</a>
+            `;
+
+            fragment.appendChild(div);
+        });
+
+        authorsContainer.innerHTML = '';
+        authorsContainer.appendChild(fragment);
+    }
+
+    function searchAuthors() {
+        const query = document.getElementById('search-input').value.trim().toLowerCase();
+        let searchQuery = '';
+
+        if (query) {
+            const isOnlyDigits = /^\d+$/.test(query);
+            if (isOnlyDigits || query.length >= 2) {
+                searchQuery = query;
+            }
+        }
+
+        searchData.stroke = searchQuery;
+        searchData.page = 1;
+        loadAuthors();
+    }
+
+    function resetAll() {
+        searchData.stroke = '';
+        searchData.page = 1;
+        searchData.sort = 2;  // SortNameAsc
+        searchData.count = 10;
+        document.getElementById('search-input').value = '';
+        document.getElementById('sortSelect').value = '2';
+        document.getElementById('countSelect').value = '10';
+        loadAuthors();
+    }
+
+    function escapeHtml(unsafe) {
+        if (!unsafe) return '';
+        return unsafe.toString()
+            .replace(/&/g, "&amp;")
+            .replace(/</g, "&lt;")
+            .replace(/>/g, "&gt;")
+            .replace(/"/g, "&quot;")
+            .replace(/'/g, "&#039;");
+    }
+
+    function showError() {
+        const authorsContainer = document.getElementById('authors');
+        authorsContainer.innerHTML = `
+            <div class="error-message">
+                Ошибка при загрузке авторов. Пожалуйста, попробуйте позже.
+                <button onclick="loadAuthors()" style="
+                    margin-top: 1rem;
+                    padding: 0.5rem 1rem;
+                    background: var(--primary-color);
+                    color: white;
+                    border: none;
+                    border-radius: 4px;
+                    cursor: pointer;
+                ">
+                    Повторить попытку
+                </button>
+            </div>
+        `;
+    }
+</script>
+</body>
+</html>
